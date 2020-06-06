@@ -1,5 +1,6 @@
 package me.swirtzly.regeneration.client.gui;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import me.swirtzly.regeneration.Regeneration;
 import me.swirtzly.regeneration.client.gui.parts.ContainerBlank;
@@ -9,23 +10,23 @@ import me.swirtzly.regeneration.common.skin.HandleSkins;
 import me.swirtzly.regeneration.network.NetworkDispatcher;
 import me.swirtzly.regeneration.network.messages.NextSkinMessage;
 import me.swirtzly.regeneration.util.client.ClientUtil;
+import me.swirtzly.regeneration.util.client.RenderUtil;
 import me.swirtzly.regeneration.util.client.TexUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.client.renderer.Quaternion;
+import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.entity.model.PlayerModel;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraftforge.fml.client.config.GuiButtonExt;
 
 import java.awt.*;
 import java.io.File;
 import java.util.List;
-
-import static me.swirtzly.regeneration.util.client.RenderUtil.drawModelToGui;
 
 public class SkinChoiceScreen extends ContainerScreen {
 
@@ -59,7 +60,7 @@ public class SkinChoiceScreen extends ContainerScreen {
         final int btnW = 60, btnH = 18;
         rotation = 0;
         position = 0;
-        GuiButtonExt btnNext = new GuiButtonExt(cx + 25, cy + 75, 20, 20, new TranslationTextComponent("regeneration.gui.previous").getFormattedText(), new Button.IPressable() {
+        Button btnNext = new Button(cx + 25, cy + 75, 20, 20, new TranslationTextComponent("regeneration.gui.previous").getFormattedText(), new Button.IPressable() {
             @Override
             public void onPress(Button button) {
                 if (!PLAYER_TEXTURE.equals(Minecraft.getInstance().player.getLocationSkin())) {
@@ -74,7 +75,7 @@ public class SkinChoiceScreen extends ContainerScreen {
                 }
             }
         });
-        GuiButtonExt btnPrevious = new GuiButtonExt(cx + 130, cy + 75, 20, 20, new TranslationTextComponent("regeneration.gui.next").getFormattedText(), new Button.IPressable() {
+        Button btnPrevious = new Button(cx + 130, cy + 75, 20, 20, new TranslationTextComponent("regeneration.gui.next").getFormattedText(), new Button.IPressable() {
             @Override
             public void onPress(Button button) {
                 // Previous
@@ -90,26 +91,26 @@ public class SkinChoiceScreen extends ContainerScreen {
                 }
             }
         });
-        GuiButtonExt btnBack = new GuiButtonExt(cx + 25, cy + 145, btnW, btnH, new TranslationTextComponent("regeneration.gui.back").getFormattedText(), new Button.IPressable() {
+        Button btnBack = new Button(cx + 25, cy + 145, btnW, btnH, new TranslationTextComponent("regeneration.gui.back").getFormattedText(), new Button.IPressable() {
             @Override
             public void onPress(Button button) {
                 Minecraft.getInstance().displayGuiScreen(new ColorScreen());
             }
         });
-        GuiButtonExt btnOpenFolder = new GuiButtonExt(cx + 90, cy + 145, btnW, btnH, new TranslationTextComponent("regeneration.gui.open_folder").getFormattedText(), new Button.IPressable() {
+        Button btnOpenFolder = new Button(cx + 90, cy + 145, btnW, btnH, new TranslationTextComponent("regeneration.gui.open_folder").getFormattedText(), new Button.IPressable() {
             @Override
             public void onPress(Button button) {
                 Util.getOSType().openFile(SkinManipulation.SKIN_DIRECTORY);
             }
         });
-        GuiButtonExt btnSave = new GuiButtonExt(cx + 90, cy + 125, btnW, btnH, new TranslationTextComponent("regeneration.gui.save").getFormattedText(), new Button.IPressable() {
+        Button btnSave = new Button(cx + 90, cy + 125, btnW, btnH, new TranslationTextComponent("regeneration.gui.save").getFormattedText(), new Button.IPressable() {
             @Override
             public void onPress(Button button) {
                 updateModels();
                 NetworkDispatcher.sendToServer(new NextSkinMessage(HandleSkins.imageToPixelData(skins.get(position)), isAlex));
             }
         });
-        GuiButtonExt btnResetSkin = new GuiButtonExt(cx + 25, cy + 125, btnW, btnH, new TranslationTextComponent("regeneration.gui.reset_skin").getFormattedText(), new Button.IPressable() {
+        Button btnResetSkin = new Button(cx + 25, cy + 125, btnW, btnH, new TranslationTextComponent("regeneration.gui.reset_skin").getFormattedText(), new Button.IPressable() {
             @Override
             public void onPress(Button button) {
                 ClientUtil.sendSkinResetPacket();
@@ -136,23 +137,26 @@ public class SkinChoiceScreen extends ContainerScreen {
         this.renderBackground();
         Minecraft.getInstance().getTextureManager().bindTexture(background);
         blit(guiLeft, guiTop, 0, 0, xSize, ySize);
-        GlStateManager.pushMatrix();
+
+        MatrixStack stack = new MatrixStack();
+        stack.push();
         ALEX_MODEL.isChild = false;
         STEVE_MODEL.isChild = false;
         Minecraft.getInstance().getTextureManager().bindTexture(PLAYER_TEXTURE);
+        Quaternion quaternion = Vector3f.YP.rotationDegrees(rotation);
         switch (choices) {
             case ALEX:
-                drawModelToGui(ALEX_MODEL, width / 2, height / 2 - 50, 1.0f, rotation);
+                RenderUtil.drawModelToScreen(stack, ALEX_MODEL, width / 2, height / 2 - 50, 1.0f, quaternion);
                 break;
             case STEVE:
-                drawModelToGui(STEVE_MODEL, width / 2, height / 2 - 50, 1.0f, rotation);
+                RenderUtil.drawModelToScreen(stack, STEVE_MODEL, width / 2, height / 2 - 50, 1.0f, quaternion);
                 break;
             case EITHER:
-                drawModelToGui(ALEX_MODEL, width / 2 - 40, height / 2 - 50, 1.0f, rotation);
-                drawModelToGui(STEVE_MODEL, width / 2 + 40, height / 2 - 50, 1.0f, rotation);
+                RenderUtil.drawModelToScreen(stack, ALEX_MODEL, width / 2 - 40, height / 2 - 50, 1.0f, quaternion);
+                RenderUtil.drawModelToScreen(stack, STEVE_MODEL, width / 2 + 40, height / 2 - 50, 1.0f, quaternion);
                 break;
         }
-        GlStateManager.popMatrix();
+        stack.pop();
 
         drawCenteredString(Minecraft.getInstance().fontRenderer, new TranslationTextComponent("regeneration.gui.current_skin").getUnformattedComponentText(), width / 2, height / 2 + 5, Color.WHITE.getRGB());
         drawCenteredString(Minecraft.getInstance().fontRenderer, new TranslationTextComponent(skins.get(position).getName().replaceAll(".png", "")).getUnformattedComponentText(), width / 2, height / 2 + 15, Color.WHITE.getRGB());

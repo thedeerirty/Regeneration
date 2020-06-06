@@ -19,16 +19,12 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.tardis.mod.helper.PlayerHelper;
 
 import javax.annotation.Nullable;
 
@@ -39,11 +35,6 @@ import javax.annotation.Nullable;
 public class ArchBlock extends DirectionalBlock implements ICompatObject {
     public ArchBlock(Properties properties) {
         super(properties);
-    }
-
-    @Override
-    public BlockRenderLayer getRenderLayer() {
-        return BlockRenderLayer.TRANSLUCENT;
     }
 
     @Override
@@ -77,45 +68,45 @@ public class ArchBlock extends DirectionalBlock implements ICompatObject {
     }
 
     @Override
-    public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-        if (worldIn.isRemote) return false;
+    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+        if (worldIn.isRemote) return ActionResultType.FAIL;
         ItemStack mainHandItem = player.getHeldItemMainhand();
         ItemStack headItem = player.getItemStackFromSlot(EquipmentSlotType.HEAD);
         IRegen cap = RegenCap.get(player).orElse(null);
         int regensLeftInHand = ArchHelper.getRegenerations(mainHandItem);
 
-        if (mainHandItem.isEmpty()) return false;
+        if (mainHandItem.isEmpty()) return ActionResultType.FAIL;
         if (handIn == Hand.MAIN_HAND && cap.getState() == PlayerUtil.RegenState.ALIVE) {
 
             if (mainHandItem.getItem() == this.asItem() || mainHandItem.getItem() == Item.getItemFromBlock(RegenObjects.Blocks.HAND_JAR.get())) {
-                PlayerHelper.sendMessageToPlayer(player, new TranslationTextComponent("regeneration.messages.item_invalid"), true);
-                return true;
+                player.sendMessage(new TranslationTextComponent("regeneration.messages.item_invalid"));
+                return ActionResultType.SUCCESS;
             }
 
             if (cap.getRegenerationsLeft() > 0 && regensLeftInHand == 0) {
                 int stored = cap.getRegenerationsLeft();
                 ArchHelper.storeRegenerations(mainHandItem, cap.getRegenerationsLeft());
                 cap.extractRegeneration(cap.getRegenerationsLeft());
-                PlayerHelper.sendMessageToPlayer(player, new TranslationTextComponent("regeneration.messages.stored_item", stored, new TranslationTextComponent(mainHandItem.getTranslationKey())), true);
+                player.sendMessage(new TranslationTextComponent("regeneration.messages.stored_item", stored, new TranslationTextComponent(mainHandItem.getTranslationKey())));
                 worldIn.removeBlock(pos, false);
                 cap.synchronise();
-                return true;
+                return ActionResultType.SUCCESS;
             }
 
             if (cap.getRegenerationsLeft() >= 0 && regensLeftInHand > 0) {
                 int needed = RegenConfig.COMMON.regenCapacity.get() - cap.getRegenerationsLeft(), used = Math.min(regensLeftInHand, needed);
                 ArchHelper.storeRegenerations(mainHandItem, regensLeftInHand - used);
-                PlayerHelper.sendMessageToPlayer(player, new TranslationTextComponent("regeneration.messages.item_taken_regens", used, new TranslationTextComponent(mainHandItem.getTranslationKey())), true);
+                player.sendMessage(new TranslationTextComponent("regeneration.messages.item_taken_regens", used, new TranslationTextComponent(mainHandItem.getTranslationKey())));
                 worldIn.removeBlock(pos, false);
                 cap.receiveRegenerations(used);
                 cap.synchronise();
-                return true;
+                return ActionResultType.SUCCESS;
             }
 
-            PlayerHelper.sendMessageToPlayer(player, new TranslationTextComponent("regeneration.messages.regen_fail"), true);
+            player.sendMessage(new TranslationTextComponent("regeneration.messages.regen_fail"));
         }
 
-        return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
+        return ActionResultType.PASS;
     }
 
     @Override

@@ -12,16 +12,16 @@ import me.swirtzly.regeneration.util.client.ClientUtil;
 import me.swirtzly.regeneration.util.client.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
+import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraftforge.fml.client.config.GuiButtonExt;
-import net.minecraftforge.fml.client.config.GuiSlider;
+import net.minecraftforge.fml.client.gui.widget.Slider;
 
 import java.awt.*;
 
-public class ColorScreen extends ContainerScreen implements GuiSlider.ISlider {
+public class ColorScreen extends ContainerScreen implements Slider.ISlider {
 
     private static final ResourceLocation background = new ResourceLocation(Regeneration.MODID, "textures/gui/customizer_background.png");
 
@@ -59,7 +59,7 @@ public class ColorScreen extends ContainerScreen implements GuiSlider.ISlider {
         final int sliderW = 70, sliderH = 20;
 
         // Reset Style Button
-        this.addButton(new GuiButtonExt(cx + 25, cy + 125, btnW, btnH, new TranslationTextComponent("regeneration.gui.undo").getFormattedText(), button -> {
+        this.addButton(new Button(cx + 25, cy + 125, btnW, btnH, new TranslationTextComponent("regeneration.gui.undo").getFormattedText(), button -> {
             slidePrimaryRed.setValue(initialPrimary.x);
             slidePrimaryGreen.setValue(initialPrimary.y);
             slidePrimaryBlue.setValue(initialPrimary.z);
@@ -70,13 +70,13 @@ public class ColorScreen extends ContainerScreen implements GuiSlider.ISlider {
         }));
 
         // Reset Skin Button
-        this.addButton(new GuiButtonExt(cx + 25, cy + 145, btnW, btnH, new TranslationTextComponent("regeneration.gui.reset_skin").getFormattedText(), p_onPress_1_ -> ClientUtil.sendSkinResetPacket()));
+        this.addButton(new Button(cx + 25, cy + 145, btnW, btnH, new TranslationTextComponent("regeneration.gui.reset_skin").getFormattedText(), p_onPress_1_ -> ClientUtil.sendSkinResetPacket()));
 
         // Customize Button
-        this.addButton(new GuiButtonExt(cx + 90, cy + 145, btnW, btnH, new TranslationTextComponent("regeneration.gui.close").getFormattedText(), button -> Minecraft.getInstance().displayGuiScreen(null)));
+        this.addButton(new Button(cx + 90, cy + 145, btnW, btnH, new TranslationTextComponent("regeneration.gui.close").getFormattedText(), button -> Minecraft.getInstance().displayGuiScreen(null)));
 
         // Default Button
-        this.addButton(new GuiButtonExt(cx + 90, cy + 125, btnW, btnH, new TranslationTextComponent("regeneration.gui.default").getFormattedText(), button -> {
+        this.addButton(new Button(cx + 90, cy + 125, btnW, btnH, new TranslationTextComponent("regeneration.gui.default").getFormattedText(), button -> {
             RegenCap.get(Minecraft.getInstance().player).ifPresent((data) -> {
                 RegenType regenType = data.getType().create();
                 slidePrimaryRed.setValue(regenType.getDefaultPrimaryColor().x);
@@ -156,7 +156,7 @@ public class ColorScreen extends ContainerScreen implements GuiSlider.ISlider {
     }
 
     @Override
-    public void onChangeSliderValue(GuiSlider slider) {
+    public void onChangeSliderValue(Slider slider) {
         CompoundNBT nbt = new CompoundNBT();
         nbt.putFloat("PrimaryRed", (float) slidePrimaryRed.getValue());
         nbt.putFloat("PrimaryGreen", (float) slidePrimaryGreen.getValue());

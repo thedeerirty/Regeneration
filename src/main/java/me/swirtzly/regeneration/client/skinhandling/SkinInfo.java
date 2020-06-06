@@ -32,16 +32,31 @@ public class SkinInfo {
     }
 	
 	public enum SkinType {
-		ALEX("slim"), STEVE("default");
+		ALEX("slim", "alex"), STEVE("default", "steve");
 		
 		private final String type;
+		private final String texturePath;
 		
-		SkinType(String type) {
+		SkinType(String type, String textureName) {
 			this.type = type;
+			this.texturePath = "textures/entity/" + textureName + ".png";
 		}
 		
 		public String getMojangType() {
 			return type;
+		}
+
+		public String getTexturePath() {
+			return texturePath;
+		}
+
+		public static SkinType fromString(String id) {
+			for (SkinType skinType : SkinType.values()) {
+				if (skinType.getMojangType().equals(id)) {
+					return skinType;
+				}
+			}
+			return ALEX;
 		}
 	}
 	

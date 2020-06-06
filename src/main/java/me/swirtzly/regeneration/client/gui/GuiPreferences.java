@@ -18,7 +18,6 @@ import net.minecraft.client.gui.screen.inventory.InventoryScreen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraftforge.fml.client.config.GuiButtonExt;
 
 import java.awt.*;
 
@@ -45,8 +44,8 @@ public class GuiPreferences extends ContainerScreen {
 		final int btnW = 66, btnH = 18;
 		ROTATION = 0;
 
-		GuiButtonExt btnClose = new GuiButtonExt(width / 2 - 109, cy + 145, 71, btnH, new TranslationTextComponent("regeneration.gui.close").getFormattedText(), onPress -> Minecraft.getInstance().displayGuiScreen(null));
-		GuiButtonExt btnRegenType = new GuiButtonExt(width / 2 + 50 - 66, cy + 125, btnW * 2, btnH, new TranslationTextComponent("regentype." + SELECTED_TYPE.getRegistryName()).getUnformattedComponentText(), new Button.IPressable() {
+		Button btnClose = new Button(width / 2 - 109, cy + 145, 71, btnH, new TranslationTextComponent("regeneration.gui.close").getFormattedText(), onPress -> Minecraft.getInstance().displayGuiScreen(null));
+		Button btnRegenType = new Button(width / 2 + 50 - 66, cy + 125, btnW * 2, btnH, new TranslationTextComponent("regentype." + SELECTED_TYPE.getRegistryName()).getUnformattedComponentText(), new Button.IPressable() {
 			@Override
 			public void onPress(Button button) {
                 int pos = RegenTypes.getPosition(SELECTED_TYPE) + 1;
@@ -62,7 +61,7 @@ public class GuiPreferences extends ContainerScreen {
 
         //btnRegenType.active = false;
 
-		GuiButtonExt btnSkinType = new GuiButtonExt(width / 2 + 50 - 66, cy + 85, btnW * 2, btnH, new TranslationTextComponent("regeneration.gui.skintype", new TranslationTextComponent("skintype." + CHOICES.name().toLowerCase())).getUnformattedComponentText(), new Button.IPressable() {
+		Button btnSkinType = new Button(width / 2 + 50 - 66, cy + 85, btnW * 2, btnH, new TranslationTextComponent("regeneration.gui.skintype", new TranslationTextComponent("skintype." + CHOICES.name().toLowerCase())).getUnformattedComponentText(), new Button.IPressable() {
 			@Override
 			public void onPress(Button button) {
 				if (CHOICES.next() != null) {
@@ -76,13 +75,13 @@ public class GuiPreferences extends ContainerScreen {
 		});
 		btnRegenType.setMessage(new TranslationTextComponent("regeneration.gui.type", SELECTED_TYPE.create().getTranslation()).getUnformattedComponentText());
 
-		GuiButtonExt btnColor = new GuiButtonExt(width / 2 + 50 - 66, cy + 105, btnW * 2, btnH, new TranslationTextComponent("regeneration.gui.color_gui").getUnformattedComponentText(), new Button.IPressable() {
+		Button btnColor = new Button(width / 2 + 50 - 66, cy + 105, btnW * 2, btnH, new TranslationTextComponent("regeneration.gui.color_gui").getUnformattedComponentText(), new Button.IPressable() {
 			@Override
 			public void onPress(Button button) {
 				Minecraft.getInstance().displayGuiScreen(new ColorScreen());
 			}
 		});
-		GuiButtonExt btnOpenFolder = new GuiButtonExt(width / 2 + 50 - 66, cy + 145, btnW * 2, btnH, new TranslationTextComponent("regeneration.gui.skin_choice").getFormattedText(), new Button.IPressable() {
+		Button btnOpenFolder = new Button(width / 2 + 50 - 66, cy + 145, btnW * 2, btnH, new TranslationTextComponent("regeneration.gui.skin_choice").getFormattedText(), new Button.IPressable() {
 			@Override
 			public void onPress(Button p_onPress_1_) {
 				Minecraft.getInstance().displayGuiScreen(new SkinChoiceScreen());

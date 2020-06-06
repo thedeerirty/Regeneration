@@ -33,11 +33,11 @@ public class GeneralAnimations implements AnimationManager.IAnimate {
                 if (!(renderer.getEntityModel() instanceof BipedModel)) return;
                 BipedModel modelPlayer = (BipedModel) renderer.getEntityModel();
                 if (data.hasDroppedHand() && data.getState() == PlayerUtil.RegenState.POST) {
-                    modelPlayer.bipedRightArm.isHidden = data.getCutoffHand() == HandSide.RIGHT;
-                    modelPlayer.bipedLeftArm.isHidden = data.getCutoffHand() == HandSide.LEFT;
+                    modelPlayer.bipedRightArm.showModel = data.getCutoffHand() != HandSide.RIGHT;
+                    modelPlayer.bipedLeftArm.showModel = data.getCutoffHand() != HandSide.LEFT;
                 } else {
-                    modelPlayer.bipedLeftArm.isHidden = false;
-                    modelPlayer.bipedRightArm.isHidden = false;
+                    modelPlayer.bipedLeftArm.showModel = true;
+                    modelPlayer.bipedRightArm.showModel = true;
                 }
 
 

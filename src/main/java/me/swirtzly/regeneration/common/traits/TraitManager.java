@@ -15,7 +15,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.event.entity.player.PlayerPickupXpEvent;
+import net.minecraftforge.event.entity.player.PlayerXpEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -76,8 +76,8 @@ public class TraitManager {
 	}
 	
 	@SubscribeEvent
-	public static void onXpPickup(PlayerPickupXpEvent e) {
-        RegenCap.get(e.getEntityPlayer()).ifPresent((data) -> {
+	public static void onXpPickup(PlayerXpEvent.PickupXp e) {
+        RegenCap.get(e.getPlayer()).ifPresent((data) -> {
             IDna dna = TraitManager.getDnaEntry(data.getDnaType());
             if (dna.getRegistryName().equals(TraitManager.DNA_DUMB.getRegistryName()) && data.isDnaActive()) {
                 e.getOrb().xpValue *= 0.5;

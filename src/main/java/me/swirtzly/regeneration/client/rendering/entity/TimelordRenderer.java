@@ -21,7 +21,6 @@ import net.minecraft.client.renderer.entity.layers.HeldItemLayer;
 import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.entity.model.PlayerModel;
-import net.minecraft.client.renderer.entity.model.RendererModel;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.client.resources.DefaultPlayerSkin;
@@ -48,11 +47,11 @@ public class TimelordRenderer extends LivingRenderer<TimelordEntity, BipedModel<
     public static HashMap<UUID, ResourceLocation> TIMELORDS = new HashMap<>();
 
     public TimelordRenderer(EntityRendererManager entityRendererManager) {
-        super(entityRendererManager, new BipedModel<>(), 0.1F);
+        super(entityRendererManager, new BipedModel<TimelordEntity>(0.0f), 0.1F);
         addLayer(new RegenerationLayer(this));
         addLayer(new HandsLayer(this));
         addLayer(new HeldItemLayer<>(this));
-        addLayer(new ArrowLayer<>(this));
+        addLayer(new ArrowLayer<TimelordEntity, TimelordModel>(this));
         addLayer(new HeadLayer<>(this));
         addLayer(new BipedArmorLayer<>(this, new BipedModel<>(0.5F), new BipedModel<>(1.0F)));
     }
@@ -136,7 +135,7 @@ public class TimelordRenderer extends LivingRenderer<TimelordEntity, BipedModel<
 
     @Nullable
     @Override
-    protected ResourceLocation getEntityTexture(TimelordEntity entity) {
+    public ResourceLocation getEntityTexture(TimelordEntity entity) {
         switch (entity.getTimelordType()) {
             case COUNCIL:
                 return new ResourceLocation(Regeneration.MODID, "textures/entity/timelords/timelord/timelord_council.png");

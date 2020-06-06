@@ -1,5 +1,6 @@
 package me.swirtzly.regeneration.client.rendering.layers;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import me.swirtzly.regeneration.common.capability.IRegen;
 import me.swirtzly.regeneration.common.capability.RegenCap;
@@ -7,6 +8,7 @@ import me.swirtzly.regeneration.common.types.RegenType;
 import me.swirtzly.regeneration.util.client.RenderUtil;
 import me.swirtzly.regeneration.util.common.PlayerUtil;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.entity.model.PlayerModel;
@@ -54,8 +56,9 @@ public class RegenerationLayer extends LayerRenderer {
 		RenderUtil.finishRenderLightning();
 	}
 
+
     @Override
-    public void render(Entity entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+    public void render(MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn, Entity entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         LivingEntity player = (LivingEntity) entity;
         RegenCap.get(player).ifPresent((data) -> {
             RegenType type = data.getType().create();
@@ -70,7 +73,7 @@ public class RegenerationLayer extends LayerRenderer {
         });
 
     }
-
+    
     @Override
 	public boolean shouldCombineTextures() {
 		return false;

@@ -3,6 +3,7 @@ package me.swirtzly.regeneration.common.block;
 import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.tiles.HandInJarTile;
 import me.swirtzly.regeneration.handlers.RegenObjects;
+import me.swirtzly.regeneration.util.common.MathUtil;
 import me.swirtzly.regeneration.util.common.PlayerUtil;
 import me.swirtzly.regeneration.util.common.RegenShapes;
 import me.swirtzly.regeneration.util.common.VoxelShapeUtils;
@@ -48,7 +49,8 @@ public class BlockHandInJar extends DirectionalBlock {
 	}
 
 	public static Direction getFacingFromEntity(BlockPos clickedBlock, LivingEntity entity) {
-		Direction direction = Direction.getFacingFromVector((float) (entity.posX - clickedBlock.getX()), (float) (entity.posY - clickedBlock.getY()), (float) (entity.posZ - clickedBlock.getZ()));
+		BlockPos distance = MathUtil.getDistance(clickedBlock, entity.getPosition());
+		Direction direction = Direction.getFacingFromVector(distance.getX(), distance.getY(), distance.getZ());
 		if (direction == Direction.UP || direction == Direction.DOWN) {
 			return Direction.NORTH;
 		}
@@ -95,21 +97,19 @@ public class BlockHandInJar extends DirectionalBlock {
 	}
 
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		if (worldIn.isRemote) return false;
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+		if (worldIn.isRemote) return ActionResultType.FAIL;
 
         if (player instanceof ServerPlayerEntity) {
-            ServerPlayerEntity playerEntity = (ServerPlayerEntity) player;
-            //ResourceLocation p_i47939_1_, SoundCategory p_i47939_2_, Vec3d p_i47939_3_, float p_i47939_4_, float p_i47939_5_
-            playerEntity.connection.sendPacket(new SPlaySoundPacket());
-        }
+			((ServerPlayerEntity) player).connection.sendPacket(new SPlaySoundPacket());
+		}
 
         if (worldIn.getTileEntity(pos) instanceof HandInJarTile) {
             HandInJarTile jar = (HandInJarTile) worldIn.getTileEntity(pos);
 
 			RegenCap.get(player).ifPresent((data) -> {
 
-				if (jar.getLindosAmont() >= 100 && data.getState() == PlayerUtil.RegenState.ALIVE && player.isSneaking() && jar.hasHand()) {
+				if (jar.getLindosAmont() >= 100 && data.getState() == PlayerUtil.RegenState.ALIVE && player.isShiftKeyDown() && jar.hasHand()) {
 					PlayerUtil.lookAt(jar.getPos().getX(), jar.getPos().getY(), jar.getPos().getZ(), player);
 					jar.setLindosAmont(jar.getLindosAmont() - 100);
 					data.receiveRegenerations(1);
@@ -121,7 +121,7 @@ public class BlockHandInJar extends DirectionalBlock {
 					// return true;
 				}
 
-				if (data.getState() != PlayerUtil.RegenState.REGENERATING && !player.isSneaking()) {
+				if (data.getState() != PlayerUtil.RegenState.REGENERATING && !player.isShiftKeyDown()) {
 					NetworkHooks.openGui((ServerPlayerEntity) player, jar, jar.getPos());
 					// return true;
 				}
@@ -129,18 +129,13 @@ public class BlockHandInJar extends DirectionalBlock {
 			});
 
 		}
-		return true; //This means you can't accidentally place another block when you click this
+		return ActionResultType.SUCCESS; //This means you can't accidentally place another block when you click this
 	}
 
 	@Nullable
 	@Override
 	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
         return new HandInJarTile();
-	}
-
-	@Override
-	public BlockRenderLayer getRenderLayer() {
-		return BlockRenderLayer.TRANSLUCENT;
 	}
 
 	@Override

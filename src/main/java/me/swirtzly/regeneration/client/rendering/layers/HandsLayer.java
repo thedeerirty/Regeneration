@@ -1,8 +1,10 @@
 package me.swirtzly.regeneration.client.rendering.layers;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.util.common.PlayerUtil;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.IEntityRenderer;
 import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
@@ -19,42 +21,42 @@ public class HandsLayer extends LayerRenderer {
 		super(livingEntityRendererIn);
 		this.livingEntityRenderer = livingEntityRendererIn;
 	}
-	
+
 	@Override
-	public void render(Entity entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
-		GlStateManager.pushMatrix();
+	public void render(MatrixStack matrixStack, IRenderTypeBuffer buffer, int packedLightIn, Entity entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+		matrixStack.push();
 		LivingEntity entitylivingbaseIn = (LivingEntity) entity;
-        RegenCap.get(entitylivingbaseIn).ifPresent((data) -> {
+		RegenCap.get(entitylivingbaseIn).ifPresent((data) -> {
 			if (this.livingEntityRenderer.getEntityModel().isChild) {
-				GlStateManager.translatef(0.0F, 0.75F, 0.0F);
-				GlStateManager.scalef(0.5F, 0.5F, 0.5F);
+				matrixStack.translate(0.0F, 0.75F, 0.0F);
+				matrixStack.scale(0.5F, 0.5F, 0.5F);
 			}
 			if (data.areHandsGlowing()) {
-				renderHand(entitylivingbaseIn, HandSide.LEFT, EnumHandRenderType.GRACE);
-				renderHand(entitylivingbaseIn, HandSide.RIGHT, EnumHandRenderType.GRACE);
+				renderHand(entitylivingbaseIn, HandSide.LEFT, EnumHandRenderType.GRACE, matrixStack);
+				renderHand(entitylivingbaseIn, HandSide.RIGHT, EnumHandRenderType.GRACE, matrixStack);
 			}
 
-            if (data.getState() == PlayerUtil.RegenState.REGENERATING || data.isSyncingToJar()) {
-				renderHand(entitylivingbaseIn, HandSide.LEFT, EnumHandRenderType.REGEN);
-				renderHand(entitylivingbaseIn, HandSide.RIGHT, EnumHandRenderType.REGEN);
+			if (data.getState() == PlayerUtil.RegenState.REGENERATING || data.isSyncingToJar()) {
+				renderHand(entitylivingbaseIn, HandSide.LEFT, EnumHandRenderType.REGEN, matrixStack);
+				renderHand(entitylivingbaseIn, HandSide.RIGHT, EnumHandRenderType.REGEN, matrixStack);
 			}
 		});
-		
-		GlStateManager.popMatrix();
+
+		matrixStack.pop();
 	}
 
-	private void renderHand(LivingEntity player, HandSide handSide, EnumHandRenderType type) {
-		GlStateManager.pushMatrix();
+	private void renderHand(LivingEntity player, HandSide handSide, EnumHandRenderType type, MatrixStack stack) {
+		stack.push();
 
         RegenCap.get(player).ifPresent((data) -> {
-			if (player.isSneaking()) {
-				GlStateManager.translatef(0.0F, 0.2F, 0.0F);
+			if (player.isShiftKeyDown()) {
+				stack.translate(0.0F, 0.2F, 0.0F);
 			}
 			// Forge: moved this call down, fixes incorrect offset while sneaking.
 			this.translateToHand(handSide);
 			boolean flag = handSide == HandSide.LEFT;
-			GlStateManager.translatef((float) (flag ? -1 : 1) / 25.0F, 0.125F, -0.625F);
-			GlStateManager.translated(0, -0.050, 0.6);
+			stack.translate((float) (flag ? -1 : 1) / 25.0F, 0.125F, -0.625F);
+			stack.translate(0, -0.050, 0.6);
 
             if (type == EnumHandRenderType.GRACE) {
 				RegenerationLayer.renderGlowingHands(player, data, 1.5F, handSide);
@@ -66,7 +68,7 @@ public class HandsLayer extends LayerRenderer {
 
         });
 
-        GlStateManager.popMatrix();
+        stack.pop();
 	}
 	
 	protected void translateToHand(HandSide handSide) {

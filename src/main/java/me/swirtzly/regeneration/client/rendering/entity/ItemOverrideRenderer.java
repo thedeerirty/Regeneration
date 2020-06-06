@@ -1,13 +1,19 @@
 package me.swirtzly.regeneration.client.rendering.entity;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import me.swirtzly.regeneration.RegenConfig;
 import me.swirtzly.regeneration.common.entity.OverrideEntity;
 import me.swirtzly.regeneration.handlers.RegenObjects;
 import me.swirtzly.regeneration.util.client.RenderUtil;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.Quaternion;
+import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
@@ -26,45 +32,44 @@ public class ItemOverrideRenderer extends EntityRenderer<OverrideEntity> {
 	
 	@Nullable
 	@Override
-	protected ResourceLocation getEntityTexture(OverrideEntity entity) {
+	public ResourceLocation getEntityTexture(OverrideEntity entity) {
 		return null;
 	}
 
-    static void makeGlowingBall(Minecraft mc, float f, Random rand, Vec3d primaryColor, Vec3d secondaryColor) {
-        GlStateManager.rotatef((mc.player.ticksExisted + RenderUtil.renderTick) / 2F, 0, 1, 0);
+
+    static void makeGlowingBall(MatrixStack matrixStack, Minecraft mc, float f, Random rand, Vec3d primaryColor, Vec3d secondaryColor) {
+        matrixStack.rotate(Vector3f.YP.rotationDegrees((mc.player.ticksExisted + RenderUtil.renderTick) / 2F));
 
         for (int i = 0; i < 3; i++) {
-            GlStateManager.rotatef((mc.player.ticksExisted + RenderUtil.renderTick) * i / 70F, 1, 1, 0);
+        	Quaternion quaternion = Vector3f.XP.rotationDegrees((mc.player.ticksExisted + RenderUtil.renderTick) * i / 70F);
+        	quaternion.multiply(Vector3f.YP.rotationDegrees((mc.player.ticksExisted + RenderUtil.renderTick) * i / 70F));
+            matrixStack.rotate(quaternion);
             RenderUtil.drawGlowingLine(new Vec3d((-f / 2F) + rand.nextFloat() * f, (-f / 2F) + rand.nextFloat() * f, (-f / 2F) + rand.nextFloat() * f), new Vec3d((-f / 2F) + rand.nextFloat() * f, (-f / 2F) + rand.nextFloat() * f, (-f / 2F) + rand.nextFloat() * f), 0.1F, primaryColor, 0);
             RenderUtil.drawGlowingLine(new Vec3d((-f / 2F) + rand.nextFloat() * f, (-f / 2F) + rand.nextFloat() * f, (-f / 2F) + rand.nextFloat() * f), new Vec3d((-f / 2F) + rand.nextFloat() * f, (-f / 2F) + rand.nextFloat() * f, (-f / 2F) + rand.nextFloat() * f), 0.1F, secondaryColor, 0);
         }
-        RenderUtil.finishRenderLightning();
     }
-	
-	/**
-	 * Renders the desired {@code T} type Entity.
-	 */
+
 	@Override
-	public void doRender(OverrideEntity entity, double x, double y, double z, float entityYaw, float partialTicks) {
-        if (entity.getItem().isEmpty()) return;
+	public void render(OverrideEntity entity, float entityYaw, float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer buffer, int packedLightIn) {
+		if (entity.getItem().isEmpty()) return;
 		Minecraft mc = Minecraft.getInstance();
 		float f = 0.2f;
 		Random rand = entity.world.rand;
 
-		GlStateManager.pushMatrix();
+		matrixStack.push();
 		if (entity.getItem().getItem() == RegenObjects.Items.FOB_WATCH.get() && entity.getItem().getDamage() != RegenConfig.COMMON.regenCapacity.get()) {
 			for (int j = 0; j < 2; j++) {
-				RenderUtil.setupRenderLightning();
-				GlStateManager.translated(x, y + 0.20, z);
-				GlStateManager.scalef(0.7F, 0.7F, 0.7F);
-				makeGlowingBall(mc, f, rand, primaryColor, secondaryColor);
+				matrixStack.translate(0, 0.20, 0);
+				matrixStack.scale(0.7F, 0.7F, 0.7F);
+				makeGlowingBall(matrixStack, mc, f, rand, primaryColor, secondaryColor);
 			}
 		}
 
-        GlStateManager.translated(x, y + 0.17F, z);
-		GlStateManager.rotatef(-entity.rotationYaw, 0, 1, 0);
-		Minecraft.getInstance().getItemRenderer().renderItem(entity.getItem(), ItemCameraTransforms.TransformType.GROUND);
-		GlStateManager.popMatrix();
+		matrixStack.translate(0, 0.17F, 0);
+		matrixStack.rotate(new Quaternion(-entity.rotationYaw, 0, 1, 0));
+		Minecraft.getInstance().getItemRenderer().renderItem(entity.getItem(), ItemCameraTransforms.TransformType.GROUND, packedLightIn,0, matrixStack, buffer);
+		matrixStack.pop();
 	}
+
 
 }

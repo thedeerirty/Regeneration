@@ -20,7 +20,7 @@ apply plugin: 'maven-publish'
 
 version = '2.0.1'
 group = 'me.swirtzly' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = 'regeneration-1.14.4'
+archivesBaseName = 'regeneration-1.15.2'
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
@@ -28,13 +28,12 @@ configurations {
     include
 }
 
-
 repositories {
     maven { url 'https://jitpack.io' }
 }
 
 minecraft {
-    mappings channel: 'snapshot', version: '20190719-1.14.3'
+    mappings channel: 'snapshot', version: '20200225-1.15.1'
 
     runs {
         client {
@@ -94,8 +93,8 @@ minecraft {
 
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.14.4-28.2.10'
-    compile fg.deobf('com.gitlab.Spectre0987:TardisMod-1-14:master-SNAPSHOT')
+    minecraft 'net.minecraftforge:forge:1.15.2-31.1.75'
+//    compile fg.deobf('com.gitlab.Spectre0987:TardisMod-1-14:master-SNAPSHOT')
 }
 
 jar {

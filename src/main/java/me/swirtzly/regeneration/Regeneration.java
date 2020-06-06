@@ -15,7 +15,6 @@ import me.swirtzly.regeneration.common.entity.OverrideEntity;
 import me.swirtzly.regeneration.common.entity.TimelordEntity;
 import me.swirtzly.regeneration.common.skin.HandleSkins;
 import me.swirtzly.regeneration.common.traits.TraitManager;
-import me.swirtzly.regeneration.compat.TardisCompat;
 import me.swirtzly.regeneration.handlers.CommonHandler;
 import me.swirtzly.regeneration.handlers.RegenObjects;
 import me.swirtzly.regeneration.handlers.acting.ActingForwarder;

@@ -1,10 +1,9 @@
 package me.swirtzly.regeneration.client.image;
 
-import com.mojang.blaze3d.platform.TextureUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.IImageBuffer;
 import net.minecraft.client.renderer.texture.NativeImage;
-import net.minecraft.client.renderer.texture.SimpleTexture;
+import net.minecraft.client.renderer.texture.Texture;
+import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.DefaultUncaughtExceptionHandler;
 import net.minecraft.util.ResourceLocation;
@@ -16,7 +15,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -26,37 +24,34 @@ import java.net.URL;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @OnlyIn(Dist.CLIENT)
-public class ImageDownloader extends SimpleTexture {
+public class ImageDownloader extends Texture {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final AtomicInteger TEXTURE_DOWNLOADER_THREAD_ID = new AtomicInteger(0);
     @Nullable
     private final File cacheFile;
     private final String imageUrl;
-    @Nullable
-    private final IImageBuffer imageBuffer;
+
     @Nullable
     private Thread imageThread;
     private volatile boolean textureUploaded;
 
     public ImageDownloader(@Nullable File cacheFileIn, String imageUrlIn, ResourceLocation textureResourceLocation, @Nullable IImageBuffer imageBufferIn) {
-        super(textureResourceLocation);
         this.cacheFile = cacheFileIn;
         this.imageUrl = imageUrlIn;
-        this.imageBuffer = imageBufferIn;
     }
 
-    public static boolean isAlexSkin(BufferedImage image) {
+    public static boolean isAlexSkin(NativeImage image) {
         return hasAlpha(55, 20, image) && hasAlpha(55, 21, image) && hasAlpha(55, 22, image) && hasAlpha(55, 23, image) && hasAlpha(55, 24, image) && hasAlpha(55, 25, image) && hasAlpha(55, 26, image) && hasAlpha(55, 27, image) && hasAlpha(55, 28, image) && hasAlpha(55, 29, image) && hasAlpha(55, 30, image) && hasAlpha(55, 31, image) && hasAlpha(54, 20, image) && hasAlpha(54, 21, image) && hasAlpha(54, 22, image) && hasAlpha(54, 23, image) && hasAlpha(54, 24, image) && hasAlpha(54, 25, image) && hasAlpha(54, 26, image) && hasAlpha(54, 27, image) && hasAlpha(54, 28, image) && hasAlpha(54, 29, image) && hasAlpha(54, 30, image) && hasAlpha(54, 31, image) || hasAlpha(46, 52, image) && hasAlpha(46, 53, image) && hasAlpha(46, 54, image) && hasAlpha(46, 54, image) && hasAlpha(46, 55, image) && hasAlpha(46, 56, image) && hasAlpha(46, 57, image) && hasAlpha(46, 58, image) && hasAlpha(46, 59, image) && hasAlpha(46, 60, image) && hasAlpha(46, 61, image) && hasAlpha(46, 63, image) && hasAlpha(46, 53, image);
     }
 
-    public static boolean hasAlpha(int x, int y, BufferedImage image) {
-        int pixel = image.getRGB(x, y);
+    public static boolean hasAlpha(int x, int y, NativeImage image) {
+        int pixel = image.getPixelRGBA(x, y);
         return pixel >> 24 == 0x00 || ((pixel & 0x00FFFFFF) == 0);
     }
 
-    private void uploadImage(NativeImage nativeImageIn) {
-        TextureUtil.prepareImage(this.getGlTextureId(), nativeImageIn.getWidth(), nativeImageIn.getHeight());
-        nativeImageIn.uploadTextureSub(0, 0, 0, false);
+    private void uploadImage(NativeImage nativeImage) {
+        TextureUtil.prepareImage(this.getGlTextureId(), nativeImage.getWidth(), nativeImage.getHeight());
+        nativeImage.uploadTextureSub(0, 0, 0, false);
     }
 
     public void setImage(NativeImage nativeImageIn) {
@@ -85,9 +80,9 @@ public class ImageDownloader extends SimpleTexture {
 
                 try {
                     nativeimage = NativeImage.read(new FileInputStream(this.cacheFile));
-                    if (this.imageBuffer != null) {
-                        nativeimage = this.imageBuffer.parseUserSkin(nativeimage);
-                    }
+//                    if (this.imageBuffer != null) {
+//                        nativeimage = this.imageBuffer.parseUserSkin(nativeimage);
+//                    }
 
                     this.setImage(nativeimage);
                 } catch (IOException ioexception) {
@@ -131,9 +126,9 @@ public class ImageDownloader extends SimpleTexture {
 
                             try {
                                 nativeimage = NativeImage.read(inputstream);
-                                if (ImageDownloader.this.imageBuffer != null) {
-                                    nativeimage = ImageDownloader.this.imageBuffer.parseUserSkin(nativeimage);
-                                }
+//                                if (ImageDownloader.this.imageBuffer != null) {
+//                                    nativeimage = ImageDownloader.this.imageBuffer.parseUserSkin(nativeimage);
+//                                }
                             } catch (IOException ioexception) {
                                 ImageDownloader.LOGGER.warn("Error while loading the skin texture", ioexception);
                             } finally {

@@ -45,12 +45,12 @@ public class HandItem extends Item {
         return getStackTag(stack).getString("encodedTexture");
     }
 
-    public static void setSkinType(ItemStack stack, String skinType) {
-        getStackTag(stack).putString("skinType", skinType);
+    public static void setSkinType(ItemStack stack, SkinInfo.SkinType skinType) {
+        getStackTag(stack).putString("skinType", skinType.getMojangType());
     }
 
-    public static String getSkinType(ItemStack stack) {
-        return getStackTag(stack).getString("skinType");
+    public static SkinInfo.SkinType getSkinType(ItemStack stack) {
+        return SkinInfo.SkinType.fromString(getStackTag(stack).getString("skinType"));
     }
 
     public static void setTrait(ItemStack stack, String trait) {

@@ -10,7 +10,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.toasts.SystemToast;
 import net.minecraft.client.renderer.entity.model.PlayerModel;
-import net.minecraft.client.renderer.entity.model.RendererModel;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
@@ -60,18 +59,12 @@ public class ClientUtil {
 		RenderUtil.copyModelAngles(biped.bipedBody, biped.bipedBodyWear);
 		RenderUtil.copyModelAngles(biped.bipedHead, biped.bipedHeadwear);
 
-		copyRotationPoints(biped.bipedRightArm, biped.bipedRightArmwear);
-		copyRotationPoints(biped.bipedLeftArm, biped.bipedLeftArmwear);
-		copyRotationPoints(biped.bipedRightLeg, biped.bipedRightLegwear);
-		copyRotationPoints(biped.bipedLeftLeg, biped.bipedLeftLegwear);
-		copyRotationPoints(biped.bipedBody, biped.bipedBodyWear);
-		copyRotationPoints(biped.bipedHead, biped.bipedHeadwear);
-	}
-
-	public static void copyRotationPoints(RendererModel src, RendererModel dest) {
-		dest.rotationPointX = src.rotationPointX;
-		dest.rotationPointY = src.rotationPointY;
-		dest.rotationPointZ = src.rotationPointZ;
+		RenderUtil.copyRotationPoints(biped.bipedRightArm, biped.bipedRightArmwear);
+		RenderUtil.copyRotationPoints(biped.bipedLeftArm, biped.bipedLeftArmwear);
+		RenderUtil.copyRotationPoints(biped.bipedRightLeg, biped.bipedRightLegwear);
+		RenderUtil.copyRotationPoints(biped.bipedLeftLeg, biped.bipedLeftLegwear);
+		RenderUtil.copyRotationPoints(biped.bipedBody, biped.bipedBodyWear);
+		RenderUtil.copyRotationPoints(biped.bipedHead, biped.bipedHeadwear);
 	}
 	
 	public static class ImageFixer {

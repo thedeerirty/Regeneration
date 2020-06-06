@@ -1,15 +1,21 @@
 package me.swirtzly.regeneration.client.rendering.tiles;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import me.swirtzly.regeneration.client.rendering.model.HandModel;
+import me.swirtzly.regeneration.client.skinhandling.SkinInfo;
 import me.swirtzly.regeneration.client.skinhandling.SkinManipulation;
 import me.swirtzly.regeneration.common.item.HandItem;
 import me.swirtzly.regeneration.common.tiles.HandInJarTile;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.HashMap;
@@ -19,49 +25,44 @@ import java.util.HashMap;
  */
 public class HandTileRenderer extends TileEntityRenderer<HandInJarTile> {
 
-    private static final ResourceLocation TEXTURE_STEVE = new ResourceLocation("textures/entity/steve.png");
-    private static final ResourceLocation TEXTURE_ALEX = new ResourceLocation("textures/entity/alex.png");
     public static HashMap<HandInJarTile, ResourceLocation> TEXTURES = new HashMap<>();
     public static EntityModel STEVE_ARM = new HandModel(false);
     public static EntityModel ALEX_ARM = new HandModel(true);
 
-    @Override
-    public void render(HandInJarTile tileEntityIn, double x, double y, double z, float partialTicks, int destroyStage) {
-        GlStateManager.pushMatrix();
-        GlStateManager.translated(x, y, z);
-
-        if (tileEntityIn.hasHand()) {
-            String handType = HandItem.getSkinType(tileEntityIn.getHand());
-            Minecraft.getInstance().getTextureManager().bindTexture(getOrCreateTexture(tileEntityIn));
-            GlStateManager.rotatef(180, 1, 0, 0);
-            GlStateManager.translated(0.5, -1.5, -0.5);
-
-            if (handType.equals("ALEX")) {
-                ALEX_ARM.render(null, 0, 0, 0, 0, 0, 0.0625F);
-            } else {
-                STEVE_ARM.render(null, 0, 0, 0, 0, 0, 0.0625F);
-            }
-        } else {
-            TEXTURES.remove(tileEntityIn);
-        }
-
-        GlStateManager.popMatrix();
+    public HandTileRenderer(TileEntityRendererDispatcher rendererDispatcherIn) {
+        super(rendererDispatcherIn);
     }
 
-    public ResourceLocation getOrCreateTexture(HandInJarTile tileEntityHandInJar) {
+    @Override
+    public void render(HandInJarTile tileEntity, float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer buffer, int combinedLight, int combinedOverlay) {
+        if (tileEntity.hasHand()) {
+            matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
+            matrixStack.translate(0.5, -1.5, -0.5);
+            SkinInfo.SkinType skinType = HandItem.getSkinType(tileEntity.getHand());
+            IVertexBuilder vertexBuilder = buffer.getBuffer(RenderType.getEntitySolid(getOrCreateTexture(tileEntity)));
+            if (skinType == SkinInfo.SkinType.ALEX) {
+                ALEX_ARM.render(matrixStack, vertexBuilder, combinedLight, combinedOverlay, 1.0f, 1.0f, 1.0f, 1.0f);
+            } else {
+                STEVE_ARM.render(matrixStack, vertexBuilder, combinedLight, combinedOverlay, 1.0f, 1.0f, 1.0f, 1.0f);
+            }
+        } else {
+            TEXTURES.remove(tileEntity);
+        }
+    }
 
-        if (HandItem.getTextureString(tileEntityHandInJar.getHand()).equalsIgnoreCase("NONE")) {
-            boolean isAlex = HandItem.getSkinType(tileEntityHandInJar.getHand()).equalsIgnoreCase("ALEX");
-            return isAlex ? TEXTURE_ALEX : TEXTURE_STEVE;
+    public ResourceLocation getOrCreateTexture(HandInJarTile handInJarTile) {
+
+        if (HandItem.getTextureString(handInJarTile.getHand()).equalsIgnoreCase("NONE")) {
+            return new ResourceLocation(HandItem.getSkinType(handInJarTile.getHand()).getTexturePath());
         }
 
-        if (!TEXTURES.containsKey(tileEntityHandInJar)) {
-            NativeImage image = SkinManipulation.decodeToImage(HandItem.getTextureString(tileEntityHandInJar.getHand()));
+        if (!TEXTURES.containsKey(handInJarTile)) {
+            NativeImage image = SkinManipulation.decodeToImage(HandItem.getTextureString(handInJarTile.getHand()));
             ResourceLocation res = Minecraft.getInstance().getTextureManager().getDynamicTextureLocation("hand_", new DynamicTexture(image));
-            TEXTURES.put(tileEntityHandInJar, res);
+            TEXTURES.put(handInJarTile, res);
             return res;
         }
-        return TEXTURES.get(tileEntityHandInJar);
+        return TEXTURES.get(handInJarTile);
     }
 
 }

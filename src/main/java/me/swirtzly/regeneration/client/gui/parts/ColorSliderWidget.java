@@ -1,10 +1,10 @@
 package me.swirtzly.regeneration.client.gui.parts;
 
-import net.minecraftforge.fml.client.config.GuiSlider;
+import net.minecraftforge.fml.client.gui.widget.Slider;
 
 import javax.annotation.Nullable;
 
-public class ColorSliderWidget extends GuiSlider {
+public class ColorSliderWidget extends Slider {
 
     public ColorSliderWidget(int xPos, int yPos, int width, int height, String prefix, String suf, double minVal, double maxVal, double currentVal, boolean showDec, boolean drawStr, IPressable handler) {
 		super(xPos, yPos, width, height, prefix, suf, minVal, maxVal, currentVal, showDec, drawStr, handler);
@@ -24,7 +24,7 @@ public class ColorSliderWidget extends GuiSlider {
 		long factor = (long) Math.pow(10, places);
 		value = value * factor;
 		long tmp = Math.round(value);
-		return (double) Math.round(tmp / factor);
+		return Math.round(tmp / factor);
 	}
 
     @Override

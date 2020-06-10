@@ -1,6 +1,6 @@
 package me.swirtzly.regeneration.client.gui;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import me.swirtzly.regeneration.Regeneration;
 import me.swirtzly.regeneration.client.gui.parts.ContainerBlank;
 import me.swirtzly.regeneration.client.skinhandling.SkinManipulation;
@@ -9,10 +9,14 @@ import me.swirtzly.regeneration.common.skin.HandleSkins;
 import me.swirtzly.regeneration.network.NetworkDispatcher;
 import me.swirtzly.regeneration.network.messages.NextSkinMessage;
 import me.swirtzly.regeneration.util.client.ClientUtil;
+import me.swirtzly.regeneration.util.client.RenderUtil;
 import me.swirtzly.regeneration.util.client.TexUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.client.renderer.Quaternion;
+import net.minecraft.client.renderer.Vector3f;
+import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.entity.model.PlayerModel;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.resources.DefaultPlayerSkin;
@@ -24,8 +28,6 @@ import net.minecraft.util.text.TranslationTextComponent;
 import java.awt.*;
 import java.io.File;
 import java.util.List;
-
-import static me.swirtzly.regeneration.util.client.RenderUtil.drawModelToGui;
 
 public class NewSkinSelectionScreen extends ContainerScreen {
 
@@ -141,57 +143,36 @@ public class NewSkinSelectionScreen extends ContainerScreen {
         Minecraft.getInstance().getTextureManager().bindTexture(background);
         blit(guiLeft, guiTop, 0, 0, xSize, ySize);
 
-        GlStateManager.pushMatrix();
+        MatrixStack matrixStack = new MatrixStack();
 
         ALEX_MODEL.isChild = false;
         STEVE_MODEL.isChild = false;
         Minecraft.getInstance().getTextureManager().bindTexture(PLAYER_TEXTURE);
 
         int offset = 0;
+        Quaternion quaternion = Vector3f.YP.rotationDegrees(rotation);
         for (int i = 0; i < skins.size(); i++) {
             if (i % 4 == 0) {
                 offset += 10;
             }
-            GlStateManager.pushMatrix();
+            matrixStack.push();
             Minecraft.getInstance().getTextureManager().bindTexture(TexUtil.fileTotexture(skins.get(getPosition(i))));
-            drawModelToGui(isPosAlex(getPosition(i)) ? ALEX_MODEL : STEVE_MODEL, width / 2 + 20 * i, height / 2 + offset, 1.5f, rotation);
-            GlStateManager.popMatrix();
+            RenderUtil.drawModelToScreen(matrixStack, getModel(getPosition(i)), width / 2 + 20 * i, height / 2 + offset, 1.5f, quaternion);
+            matrixStack.pop();
         }
 
-   /*     GlStateManager.pushMatrix();
-        Minecraft.getInstance().getTextureManager().bindTexture(SkinManipulation.createGuiTexture(skins.get(getPosition(0))));
-        drawModelToGui(isPosAlex(getPosition(0)) ? ALEX_MODEL : STEVE_MODEL, width / 2, height / 2 - 10, 1.5f, rotation);
-        GlStateManager.popMatrix();*/
-
-
-       /* //Left First
-        GlStateManager.pushMatrix();
-        Minecraft.getInstance().getTextureManager().bindTexture(SkinManipulation.createGuiTexture(skins.get(getPosition(1))));
-        drawModelToGui(isPosAlex(getPosition(1)) ? ALEX_MODEL : STEVE_MODEL, width / 2 - 90, height / 2 - 10, 1.3f, 200);
-        GlStateManager.popMatrix();
-
-        //Right First
-        GlStateManager.pushMatrix();
-        Minecraft.getInstance().getTextureManager().bindTexture(SkinManipulation.createGuiTexture(skins.get(getPosition(3))));
-        drawModelToGui(isPosAlex(getPosition(3)) ? ALEX_MODEL : STEVE_MODEL, width / 2 + 90, height / 2 - 10, 1.3f, -200);
-        GlStateManager.popMatrix();
-
-        GlStateManager.pushMatrix();
-        Minecraft.getInstance().getTextureManager().bindTexture(SkinManipulation.createGuiTexture(skins.get(getPosition(4))));
-        drawModelToGui(isPosAlex(getPosition(4)) ? ALEX_MODEL : STEVE_MODEL, width / 2 - 170, height / 2 - 10, 1.2f, 200);
-        GlStateManager.popMatrix();*/
-
-
-        GlStateManager.pushMatrix();
+        matrixStack.push();
         Minecraft.getInstance().getTextureManager().bindTexture(TexUtil.fileTotexture(skins.get(getPosition(2))));
-        drawModelToGui(isPosAlex(getPosition(2)) ? ALEX_MODEL : STEVE_MODEL, width / 2 + 170, height / 2 - 10, 1.2f, -200);
-        GlStateManager.popMatrix();
-
-        GlStateManager.popMatrix();
+        RenderUtil.drawModelToScreen(matrixStack, getModel(getPosition(2)), width / 2 + 170, height / 2 - 10, 1.2f, Vector3f.YP.rotationDegrees(-200));
+        matrixStack.pop();
 
         drawCenteredString(Minecraft.getInstance().fontRenderer, new TranslationTextComponent("regeneration.gui.current_skin").getUnformattedComponentText(), width / 2, height / 2 + 5, Color.WHITE.getRGB());
         drawCenteredString(Minecraft.getInstance().fontRenderer, new TranslationTextComponent(skins.get(position).getName().replaceAll(".png", "")).getUnformattedComponentText(), width / 2, height / 2 + 15, Color.WHITE.getRGB());
 
+    }
+
+    private EntityModel getModel(int position) {
+        return isPosAlex(position) ? ALEX_MODEL : STEVE_MODEL;
     }
 
     public int getPosition(int increase) {

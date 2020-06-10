@@ -2,9 +2,17 @@ package me.swirtzly.regeneration.client.rendering.model;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
+import me.swirtzly.regeneration.common.capability.IRegen;
+import me.swirtzly.regeneration.common.capability.RegenCap;
+import me.swirtzly.regeneration.common.entity.TimelordEntity;
+import me.swirtzly.regeneration.common.item.GunItem;
+import me.swirtzly.regeneration.util.client.RenderUtil;
+import me.swirtzly.regeneration.util.common.PlayerUtil;
+import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.model.ModelRenderer;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.HandSide;
 
 /**
  * Created by Swirtzly on 22/08/2019 @ 16:46

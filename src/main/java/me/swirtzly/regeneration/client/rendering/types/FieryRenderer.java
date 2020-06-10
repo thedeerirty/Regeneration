@@ -1,6 +1,8 @@
 package me.swirtzly.regeneration.client.rendering.types;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import me.swirtzly.regeneration.common.capability.IRegen;
 import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.types.FieryType;
@@ -9,10 +11,12 @@ import me.swirtzly.regeneration.util.client.RenderUtil;
 import me.swirtzly.regeneration.util.common.PlayerUtil;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.HandSide;
 import net.minecraft.util.math.MathHelper;
@@ -24,8 +28,9 @@ public class FieryRenderer extends ATypeRenderer<FieryType> {
 	
 	public static final FieryRenderer INSTANCE = new FieryRenderer();
 
-	public static void renderOverlay(LivingRenderer renderer, LivingEntity entityPlayer, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
-		RegenCap.get(entityPlayer).ifPresent((data) -> {
+
+	public static void renderOverlay(PlayerEntity player, MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+		RegenCap.get(player).ifPresent((data) -> {
 			GlStateManager.pushMatrix();
 			RenderUtil.setLightmapTextureCoords(240, 240);
 			GlStateManager.disableLighting();
@@ -43,14 +48,14 @@ public class FieryRenderer extends ATypeRenderer<FieryType> {
 		});
 	}
 
-	public static void renderCone(LivingEntity entityPlayer, float scale, float scale2, Vec3d color) {
+	public static void renderCone(MatrixStack matrixStack, LivingEntity entityPlayer, float scale, float scale2, Vec3d color) {
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder vertexBuffer = tessellator.getBuffer();
 
         for (int i = 0; i < 8; i++) {
-			GlStateManager.pushMatrix();
-			GlStateManager.rotatef(entityPlayer.ticksExisted * 4 + i * 45, 0.0F, 1.0F, 0.0F);
-			GlStateManager.scalef(1.0f, 1.0f, 0.65f);
+			matrixStack.push();
+			matrixStack.rotate(Vector3f.YP.rotationDegrees(entityPlayer.ticksExisted * 4 + i * 45));
+			matrixStack.scale(1.0f, 1.0f, 0.65f);
 			vertexBuffer.begin(6, DefaultVertexFormats.POSITION_COLOR);
 			vertexBuffer.pos(0.0D, 0.0D, 0.0D).color((float) color.x, (float) color.y, (float) color.z, 55).endVertex();
 			vertexBuffer.pos(-0.266D * scale, scale, -0.5F * scale).color((float) color.x, (float) color.y, (float) color.z, 55).endVertex();
@@ -58,11 +63,11 @@ public class FieryRenderer extends ATypeRenderer<FieryType> {
 			vertexBuffer.pos(0.0D, scale2, 1.0F * scale).color((float) color.x, (float) color.y, (float) color.z, 55).endVertex();
 			vertexBuffer.pos(-0.266D * scale, scale, -0.5F * scale).color((float) color.x, (float) color.y, (float) color.z, 55).endVertex();
 			tessellator.draw();
-			GlStateManager.popMatrix();
+			matrixStack.pop();
 		}
 	}
 
-    public static void renderConeAtArms(LivingEntity player, HandSide side) {
+    public static void renderConeAtArms(MatrixStack matrixStack, LivingEntity player, HandSide side) {
         GlStateManager.pushMatrix();
 		RegenCap.get(player).ifPresent((data) -> {
             double x = data.getType().create().getAnimationProgress(data);
@@ -133,22 +138,23 @@ public class FieryRenderer extends ATypeRenderer<FieryType> {
     }
 
     @Override
-	public void renderHand(LivingEntity player, HandSide handSide, LivingRenderer render) {
+	public void renderHand(MatrixStack matrixStack, LivingEntity player, HandSide handSide, LivingRenderer render) {
         if (!ModList.get().isLoaded("quark")) {
-            renderConeAtArms(player, handSide);
+            renderConeAtArms(matrixStack, player, handSide);
         }
     }
 
     @Override
-	public void renderRegenerationLayer(FieryType type, LivingRenderer renderLivingBase, IRegen capability, LivingEntity entityPlayer, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
-		
-		// State manager changes
-        GlStateManager.pushTextureAttributes();
-        GlStateManager.disableTexture();
-		GlStateManager.enableAlphaTest();
-		GlStateManager.enableBlend();
-		GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
-		GlStateManager.depthMask(true);
+	public void renderRegenerationLayer(MatrixStack matrixStack, FieryType type, LivingRenderer renderLivingBase, IRegen capability, PlayerEntity playerEntity, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+
+		// State manager changes. Probably not needed for 1.15 RenderSystem.
+//        GlStateManager.pushTextureAttributes();
+//        GlStateManager.disableTexture();
+//		GlStateManager.enableAlphaTest();
+//		GlStateManager.enableBlend();
+//		GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
+//		GlStateManager.depthMask(true);
+
 		RenderUtil.setLightmapTextureCoords(65, 65);
 		
 		CompoundNBT style = capability.getStyle();
@@ -165,36 +171,36 @@ public class FieryRenderer extends ATypeRenderer<FieryType> {
 		float secondaryScale = cf * 6.4F;
 		
 		// Render head cone
-		GlStateManager.pushMatrix();
+		matrixStack.push();
 
 		if (renderLivingBase.getEntityModel() instanceof BipedModel) {
 			BipedModel player = (BipedModel) renderLivingBase.getEntityModel();
 			player.bipedHead.postRender(scale);
 		}
 
-        GlStateManager.translatef(0f, 0.09f, 0f);
-        GlStateManager.rotatef(180, 1.0f, 0.0f, 0.0f);
-		
-		renderCone(entityPlayer, primaryScale / 1.6F, primaryScale * .75F, primaryColor);
-		renderCone(entityPlayer, secondaryScale / 1.6F, secondaryScale / 1.5F, secondaryColor);
-		GlStateManager.popMatrix();
-		
+		matrixStack.translate(0.0f, 0.09f, 0.0f);
+		matrixStack.rotate(Vector3f.XP.rotationDegrees(180));
+
+		renderCone(matrixStack, playerEntity, primaryScale / 1.6F, primaryScale * .75F, primaryColor);
+		renderCone(matrixStack, playerEntity, secondaryScale / 1.6F, secondaryScale / 1.5F, secondaryColor);
+		matrixStack.pop();
+
 		if (!capability.isSyncingToJar()) {
 			// Render glowing overlay
-			renderOverlay(renderLivingBase, entityPlayer, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale);
+			renderOverlay(playerEntity, matrixStack, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 		}
 		// Undo state manager changes
 		RenderUtil.restoreLightMap();
-		GlStateManager.depthMask(false);
-		GlStateManager.disableBlend();
-		GlStateManager.disableAlphaTest();
-		GlStateManager.color4f(255, 255, 255, 255);
-        GlStateManager.enableTexture();
-        GlStateManager.popAttributes();
+//		GlStateManager.depthMask(false);
+//		GlStateManager.disableBlend();
+//		GlStateManager.disableAlphaTest();
+//		GlStateManager.color4f(255, 255, 255, 255);
+//        GlStateManager.enableTexture();
+//        GlStateManager.popAttributes();
 
         if (ModList.get().isLoaded("quark")) {
-            renderConeAtArms(entityPlayer, HandSide.LEFT);
-            renderConeAtArms(entityPlayer, HandSide.RIGHT);
+            renderConeAtArms(matrixStack, playerEntity, HandSide.LEFT);
+            renderConeAtArms(matrixStack, playerEntity, HandSide.RIGHT);
         }
     }
 
@@ -214,7 +220,7 @@ public class FieryRenderer extends ATypeRenderer<FieryType> {
             if (data.getState() == PlayerUtil.RegenState.REGENERATING && data.getType() == RegenTypes.FIERY) {
 
                 double animationProgress = data.getAnimationTicks();
-				double arm_shake = entity.getRNG().nextDouble();
+				double armShake = entity.getRNG().nextDouble();
                 float armRotY = (float) animationProgress * 1.5F;
                 float armRotZ = (float) animationProgress * 1.5F;
                 float headRot = (float) animationProgress * 1.5F;
@@ -238,8 +244,8 @@ public class FieryRenderer extends ATypeRenderer<FieryType> {
                 playerModel.bipedLeftArm.rotateAngleX = 0;
 				playerModel.bipedRightArm.rotateAngleX = 0;
 
-                playerModel.bipedLeftArm.rotateAngleZ = (float) -Math.toRadians(armRotZ + arm_shake);
-                playerModel.bipedRightArm.rotateAngleZ = (float) Math.toRadians(armRotZ + arm_shake);
+                playerModel.bipedLeftArm.rotateAngleZ = (float) -Math.toRadians(armRotZ + armShake);
+                playerModel.bipedRightArm.rotateAngleZ = (float) Math.toRadians(armRotZ + armShake);
                 playerModel.bipedLeftArm.rotateAngleY = (float) -Math.toRadians(armRotY);
                 playerModel.bipedRightArm.rotateAngleY = (float) Math.toRadians(armRotY);
 

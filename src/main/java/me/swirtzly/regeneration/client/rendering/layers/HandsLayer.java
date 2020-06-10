@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.HandSide;
 
 public class HandsLayer extends LayerRenderer {
@@ -32,34 +33,33 @@ public class HandsLayer extends LayerRenderer {
 				matrixStack.scale(0.5F, 0.5F, 0.5F);
 			}
 			if (data.areHandsGlowing()) {
-				renderHand(entitylivingbaseIn, HandSide.LEFT, EnumHandRenderType.GRACE, matrixStack);
-				renderHand(entitylivingbaseIn, HandSide.RIGHT, EnumHandRenderType.GRACE, matrixStack);
+				renderHand(matrixStack, entitylivingbaseIn, HandSide.LEFT, EnumHandRenderType.GRACE);
+				renderHand(matrixStack, entitylivingbaseIn, HandSide.RIGHT, EnumHandRenderType.GRACE);
 			}
 
 			if (data.getState() == PlayerUtil.RegenState.REGENERATING || data.isSyncingToJar()) {
-				renderHand(entitylivingbaseIn, HandSide.LEFT, EnumHandRenderType.REGEN, matrixStack);
-				renderHand(entitylivingbaseIn, HandSide.RIGHT, EnumHandRenderType.REGEN, matrixStack);
+				renderHand(matrixStack, entitylivingbaseIn, HandSide.LEFT, EnumHandRenderType.REGEN);
+				renderHand(matrixStack, entitylivingbaseIn, HandSide.RIGHT, EnumHandRenderType.REGEN);
 			}
 		});
 
 		matrixStack.pop();
 	}
 
-	private void renderHand(LivingEntity player, HandSide handSide, EnumHandRenderType type, MatrixStack stack) {
-		stack.push();
+	private void renderHand(MatrixStack matrixStack, LivingEntity player, HandSide handSide, EnumHandRenderType type) {
+		matrixStack.push();
 
         RegenCap.get(player).ifPresent((data) -> {
 			if (player.isShiftKeyDown()) {
-				stack.translate(0.0F, 0.2F, 0.0F);
+				matrixStack.translate(0.0F, 0.2F, 0.0F);
 			}
-			// Forge: moved this call down, fixes incorrect offset while sneaking.
-			this.translateToHand(handSide);
+
 			boolean flag = handSide == HandSide.LEFT;
-			stack.translate((float) (flag ? -1 : 1) / 25.0F, 0.125F, -0.625F);
-			stack.translate(0, -0.050, 0.6);
+			matrixStack.translate((float) (flag ? -1 : 1) / 25.0F, 0.125F, -0.625F);
+			matrixStack.translate(0, -0.050, 0.6);
 
             if (type == EnumHandRenderType.GRACE) {
-				RegenerationLayer.renderGlowingHands(player, data, 1.5F, handSide);
+				RegenerationLayer.renderGlowingHands(matrixStack, player, data, 1.5F, handSide);
 			}
 
             if (type == EnumHandRenderType.REGEN) {
@@ -68,11 +68,7 @@ public class HandsLayer extends LayerRenderer {
 
         });
 
-        stack.pop();
-	}
-	
-	protected void translateToHand(HandSide handSide) {
-		((BipedModel) this.livingEntityRenderer.getEntityModel()).postRenderArm(0.0625F, handSide);
+        matrixStack.pop();
 	}
 
     public boolean shouldCombineTextures() {

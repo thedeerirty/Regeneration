@@ -1,5 +1,7 @@
 package me.swirtzly.regeneration.client.rendering.types;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import me.swirtzly.animateme.AnimationManager;
 import me.swirtzly.regeneration.common.capability.IRegen;
 import me.swirtzly.regeneration.common.types.RegenType;
@@ -15,8 +17,8 @@ public abstract class ATypeRenderer<T> implements AnimationManager.IAnimate {
 
     protected abstract void renderRegeneratingPlayerPost(T type, RenderPlayerEvent.Post event, IRegen capability);
 
-	protected abstract void renderRegenerationLayer(T type, LivingRenderer renderLivingBase, IRegen capability, LivingEntity entityPlayer, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale);
-	
+	protected abstract void renderRegenerationLayer(T type, LivingRenderer renderer, IRegen cap, LivingEntity playerEntity, MatrixStack matrixStack, IVertexBuilder buffer, int packedLight, int packedOverlay, float r, float g, float b, float a);
+
 	// Generic casting convenience methods:
 	
 	@SuppressWarnings("unchecked")
@@ -38,9 +40,9 @@ public abstract class ATypeRenderer<T> implements AnimationManager.IAnimate {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public final void onRenderRegenerationLayer(RegenType<?> type, LivingRenderer renderLivingBase, IRegen capability, LivingEntity entityPlayer, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+	public final void onRenderRegenerationLayer(RegenType<?> type, LivingRenderer renderLivingBase, IRegen capability, LivingEntity entityPlayer, MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
 		try {
-			renderRegenerationLayer((T) type, renderLivingBase, capability, entityPlayer, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale);
+			renderRegenerationLayer((T) type, renderLivingBase, capability, entityPlayer, matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 		} catch (ClassCastException e) {
 			throw new IllegalStateException("RegenType <-> RegenRenderType mismatch", e);
 		}

@@ -42,9 +42,9 @@ public class MovingSound extends TickableSound {
 				volume = RegenUtil.randFloat(1.5F, 6F);
 			}
 			
-			super.x = (float) entityObject.posX;
-			super.y = (float) entityObject.posY;
-			super.z = (float) entityObject.posZ;
+			super.x = (float) entityObject.getPosX();
+			super.y = (float) entityObject.getPosY();
+			super.z = (float) entityObject.getPosZ();
 		}
 
         if (entity instanceof TileEntity) {

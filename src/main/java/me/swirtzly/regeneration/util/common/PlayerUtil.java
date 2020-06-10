@@ -122,14 +122,14 @@ public class PlayerUtil {
             if (!data.getEncodedSkin().equalsIgnoreCase(NO_SKIN) && player instanceof PlayerEntity) {
                 ItemStack hand = new ItemStack(RegenObjects.Items.HAND.get());
                 HandItem.setTextureString(hand, data.getEncodedSkin());
-                HandItem.setSkinType(hand, data.getSkinType().name());
+                HandItem.setSkinType(hand, data.getSkinType());
                 HandItem.setOwner(hand, player.getUniqueID());
                 HandItem.setTimeCreated(hand, System.currentTimeMillis());
                 HandItem.setTrait(hand, data.getDnaType().toString());
                 data.setDroppedHand(true);
                 data.setCutOffHand(player.getPrimaryHand() == HandSide.LEFT ? HandSide.RIGHT : HandSide.LEFT);
                 data.setDroppedHand(true);
-                InventoryHelper.spawnItemStack(player.world, player.posX, player.posY, player.posZ, hand);
+                InventoryHelper.spawnItemStack(player.world, player.getPosX(), player.getPosY(), player.getPosZ(), hand);
             }
         });
     }

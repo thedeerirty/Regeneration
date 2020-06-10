@@ -35,15 +35,13 @@ public class RegenKeyBinds {
 	
 	@SubscribeEvent
 	public static void keyInput(InputUpdateEvent e) {
-		PlayerEntity player = Minecraft.getInstance().player;
-        if (player == null || Minecraft.getInstance().currentScreen != null) return;
-		
-		Minecraft minecraft = Minecraft.getInstance();
-		if (minecraft.currentScreen == null && minecraft.player != null) {
+        if (e.getPlayer() == null || Minecraft.getInstance().currentScreen != null) return;
+
+        if (Minecraft.getInstance().currentScreen == null && e.getPlayer() != null) {
 			ClientUtil.keyBind = RegenKeyBinds.getRegenerateNowDisplayName();
 		}
 
-        RegenCap.get(player).ifPresent((data) -> {
+        RegenCap.get(e.getPlayer()).ifPresent((data) -> {
 			if (REGEN_NOW.isPressed() && data.getState().isGraceful()) {
 				NetworkDispatcher.INSTANCE.sendToServer(new RegenerateMessage());
 			}

@@ -25,12 +25,10 @@ public class LaserRenderer extends EntityRenderer<LaserEntity> {
         vec1 = vec2.subtract(vec1);
         vec2 = vec2.subtract(vec2);
         vec1 = vec1.normalize();
-        double x_ = vec2.x - vec1.x;
-        double y_ = vec2.y - vec1.y;
-        double z_ = vec2.z - vec1.z;
-        double diff = MathHelper.sqrt(x_ * x_ + z_ * z_);
-        float yaw = (float) (Math.atan2(z_, x_) * 180.0D / 3.141592653589793D) - 90.0F;
-        float pitch = (float) (-(Math.atan2(y_, diff) * 180.0D / 3.141592653589793D));
+        Vec3d diff = vec2.subtract(vec1);
+        double distance = MathHelper.sqrt(Math.pow(diff.x, 2) + Math.pow(diff.z, 2));
+        float yaw = (float) (Math.atan2(diff.z, diff.x) * 180.0D / 3.141592653589793D) - 90.0F;
+        float pitch = (float) (-(Math.atan2(diff.y, distance) * 180.0D / 3.141592653589793D));
 
         matrixStack.push();
         matrixStack.rotate(new Quaternion(-yaw, 0.0F, 1.0F, 0.0F));

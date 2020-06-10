@@ -13,13 +13,6 @@ import net.minecraft.util.HandSide;
 
 public class GeneralAnimations implements AnimationManager.IAnimate {
 
-    public static void copyAnglesToWear(BipedModel modelBiped) {
-        // if (modelBiped instanceof PlayerModel) {
-        // PlayerModel playerModel = (PlayerModel) modelBiped;
-        // ClientUtil.copyAnglesToWear(playerModel);
-        // }
-    }
-
     public static void makeZombieArms(BipedModel modelBiped) {
         modelBiped.bipedRightArm.rotateAngleY = -0.1F + modelBiped.bipedHead.rotateAngleY - 0.4F;
         modelBiped.bipedLeftArm.rotateAngleY = 0.1F + modelBiped.bipedHead.rotateAngleY;
@@ -68,7 +61,6 @@ public class GeneralAnimations implements AnimationManager.IAnimate {
                 isOpen = FobWatchItem.getOpen(stack) == 1;
                 if (isOpen) {
                     makeZombieArms(modelBiped);
-                    copyAnglesToWear(modelBiped);
                 }
             }
 
@@ -77,7 +69,6 @@ public class GeneralAnimations implements AnimationManager.IAnimate {
                 isOpen = FobWatchItem.getOpen(stack) == 1;
                 if (isOpen) {
                     makeZombieArms(modelBiped);
-                    copyAnglesToWear(modelBiped);
                 }
             }
             // ==============FOB WATCH END==============
@@ -87,7 +78,6 @@ public class GeneralAnimations implements AnimationManager.IAnimate {
                 if (data.isSyncingToJar()) {
                     makeZombieArms(modelBiped);
                     modelBiped.bipedHead.rotateAngleX = (float) Math.toRadians(45);
-                    copyAnglesToWear(modelBiped);
                 }
 
             if (data.getState() == PlayerUtil.RegenState.POST && PlayerUtil.isAboveZeroGrid(entity)) {

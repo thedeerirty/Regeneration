@@ -9,11 +9,14 @@ import me.swirtzly.regeneration.util.client.RenderUtil;
 import me.swirtzly.regeneration.util.common.PlayerUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.Quaternion;
+import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.entity.model.PlayerModel;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.HandSide;
 import net.minecraft.util.math.Vec3d;
 
@@ -27,8 +30,6 @@ import static me.swirtzly.regeneration.util.client.RenderUtil.drawGlowingLine;
  */
 public class RegenerationLayer extends LayerRenderer {
 
-    public static final PlayerModel playerModelSteve = new PlayerModel(0.1F, false);
-
     private final LivingRenderer livingEntityRenderer;
 
     public RegenerationLayer(LivingRenderer livingEntityRendererIn) {
@@ -36,24 +37,23 @@ public class RegenerationLayer extends LayerRenderer {
         this.livingEntityRenderer = livingEntityRendererIn;
     }
 
-    public static void renderGlowingHands(LivingEntity player, IRegen handler, float scale, HandSide side) {
+    public static void renderGlowingHands(MatrixStack matrixStack, LivingEntity player, IRegen handler, float scale, HandSide side) {
 		Vec3d primaryColor = handler.getPrimaryColor();
 		Vec3d secondaryColor = handler.getSecondaryColor();
 		
-		Minecraft mc = Minecraft.getInstance();
 		Random rand = player.world.rand;
 		float factor = 0.2F;
-		
-		RenderUtil.setupRenderLightning();
-        GlStateManager.scalef(scale, scale, scale);
-        GlStateManager.translatef(0, 0.3F, 0);
-        GlStateManager.rotatef((mc.player.ticksExisted + RenderUtil.renderTick) / 2F, 0, 1, 0);
+
+        matrixStack.scale(scale, scale, scale);
+        matrixStack.translate(0, 0.3F, 0);
+        matrixStack.rotate(Vector3f.YP.rotationDegrees((player.ticksExisted + RenderUtil.renderTick) / 2F));
 		for (int i = 0; i < 7; i++) {
-            GlStateManager.rotatef((mc.player.ticksExisted + RenderUtil.renderTick) * i / 70F, 1, 1, 0);
+            Quaternion quaternion = Vector3f.XP.rotationDegrees((player.ticksExisted + RenderUtil.renderTick) * i / 70F);
+            quaternion.multiply(Vector3f.YP.rotationDegrees((player.ticksExisted + RenderUtil.renderTick) * i / 70F));
+            matrixStack.rotate(quaternion);
 			drawGlowingLine(new Vec3d((-factor / 2F) + rand.nextFloat() * factor, (-factor / 2F) + rand.nextFloat() * factor, (-factor / 2F) + rand.nextFloat() * factor), new Vec3d((-factor / 2F) + rand.nextFloat() * factor, (-factor / 2F) + rand.nextFloat() * factor, (-factor / 2F) + rand.nextFloat() * factor), 0.1F, primaryColor, 0);
 			drawGlowingLine(new Vec3d((-factor / 2F) + rand.nextFloat() * factor, (-factor / 2F) + rand.nextFloat() * factor, (-factor / 2F) + rand.nextFloat() * factor), new Vec3d((-factor / 2F) + rand.nextFloat() * factor, (-factor / 2F) + rand.nextFloat() * factor, (-factor / 2F) + rand.nextFloat() * factor), 0.1F, secondaryColor, 0);
 		}
-		RenderUtil.finishRenderLightning();
 	}
 
 
@@ -73,10 +73,6 @@ public class RegenerationLayer extends LayerRenderer {
         });
 
     }
-    
-    @Override
-	public boolean shouldCombineTextures() {
-		return false;
-	}
+
 	
 }

@@ -5,7 +5,6 @@ import me.swirtzly.regeneration.RegenConfig;
 import me.swirtzly.regeneration.Regeneration;
 import me.swirtzly.regeneration.client.rendering.layers.HandsLayer;
 import me.swirtzly.regeneration.client.rendering.layers.RegenerationLayer;
-import me.swirtzly.regeneration.client.rendering.model.TimelordGuardModel;
 import me.swirtzly.regeneration.client.rendering.model.TimelordModel;
 import me.swirtzly.regeneration.client.skinhandling.SkinManipulation;
 import me.swirtzly.regeneration.common.capability.IRegen;

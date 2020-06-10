@@ -105,21 +105,18 @@ public class GuiPreferences extends ContainerScreen {
 		int cx = (width - xSize) / 2;
 		int cy = (height - ySize) / 2;
 
-		GlStateManager.pushMatrix();
 		InventoryScreen.drawEntityOnScreen(width / 2 - 75, height / 2 + 45, 55, (float) (guiLeft + 51) - mouseX, (float) (guiTop + 75 - 50) - mouseY, Minecraft.getInstance().player);
-		GlStateManager.popMatrix();
 
 		drawCenteredString(Minecraft.getInstance().fontRenderer, new TranslationTextComponent("regeneration.gui.preferences").getUnformattedComponentText(), width / 2, height / 2 - 80, Color.WHITE.getRGB());
 
-		String str = "Banana Phone";
-		int length = minecraft.fontRenderer.getStringWidth(str);
+		String str;
 
 		if (RegenConfig.COMMON.infiniteRegeneration.get())
 			str = new TranslationTextComponent("regeneration.gui.infinite_regenerations").getFormattedText(); // TODO this should be optimized
 		else
 			str = new TranslationTextComponent("regeneration.gui.remaining_regens.status").getFormattedText() + " " + data.getRegenerationsLeft();
 
-		length = minecraft.fontRenderer.getStringWidth(str);
+		int length = minecraft.fontRenderer.getStringWidth(str);
 		font.drawStringWithShadow(str, cx + 170 - length / 2, cy + 21, Color.WHITE.getRGB());
 
 		TranslationTextComponent traitLang = new TranslationTextComponent(TraitManager.getDnaEntry(data.getDnaType()).getLangKey());

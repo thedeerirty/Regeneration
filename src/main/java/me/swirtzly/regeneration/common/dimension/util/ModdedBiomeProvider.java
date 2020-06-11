@@ -127,4 +127,9 @@ public class ModdedBiomeProvider extends BiomeProvider {
                 this.topBlocksCache.add(biome.getSurfaceBuilderConfig().getTop());
         return this.topBlocksCache;
     }
+
+    @Override
+    public Biome getNoiseBiome(int x, int y, int z) {
+        return null;
+    }
 }

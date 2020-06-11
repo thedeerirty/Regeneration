@@ -17,7 +17,7 @@ public abstract class ATypeRenderer<T> implements AnimationManager.IAnimate {
 
     protected abstract void renderRegeneratingPlayerPost(T type, RenderPlayerEvent.Post event, IRegen capability);
 
-	protected abstract void renderRegenerationLayer(T type, LivingRenderer renderer, IRegen cap, LivingEntity playerEntity, MatrixStack matrixStack, IVertexBuilder buffer, int packedLight, int packedOverlay, float r, float g, float b, float a);
+	protected abstract void renderRegenerationLayer(T type, LivingRenderer renderer, IRegen cap, LivingEntity playerEntity, MatrixStack matrixStack, IVertexBuilder buffer, float partialTicks, int packedLight, int packedOverlay, float r, float g, float b, float a);
 
 	// Generic casting convenience methods:
 	
@@ -40,14 +40,14 @@ public abstract class ATypeRenderer<T> implements AnimationManager.IAnimate {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public final void onRenderRegenerationLayer(RegenType<?> type, LivingRenderer renderLivingBase, IRegen capability, LivingEntity entityPlayer, MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+	public final void onRenderRegenerationLayer(RegenType<?> type, LivingRenderer renderLivingBase, IRegen capability, LivingEntity entityPlayer, MatrixStack matrixStackIn, IVertexBuilder bufferIn, float partialTicks, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
 		try {
-			renderRegenerationLayer((T) type, renderLivingBase, capability, entityPlayer, matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+			renderRegenerationLayer((T) type, renderLivingBase, capability, entityPlayer, matrixStackIn, bufferIn, partialTicks, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 		} catch (ClassCastException e) {
 			throw new IllegalStateException("RegenType <-> RegenRenderType mismatch", e);
 		}
 	}
 
-	public abstract void renderHand(LivingEntity player, HandSide handSide, LivingRenderer render);
+	public abstract void renderHand(LivingEntity player, HandSide handSide, LivingRenderer render, MatrixStack stack);
 	
 }

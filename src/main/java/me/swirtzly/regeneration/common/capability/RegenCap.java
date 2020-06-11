@@ -580,7 +580,7 @@ public class RegenCap implements IRegen {
 		public void onPunchEntity(LivingHurtEvent event) {
 			LivingEntity entity = event.getEntityLiving();
 			// We're healing mobs...
-			if (state.isGraceful() && entity.getHealth() < entity.getMaxHealth() && areHandsGlowing() && player.isSneaking()) { // ... check if we're in grace and if the mob needs health
+			if (state.isGraceful() && entity.getHealth() < entity.getMaxHealth() && areHandsGlowing() && player.isShiftKeyDown()) { // ... check if we're in grace and if the mob needs health
 				float healthNeeded = entity.getMaxHealth() - entity.getHealth();
 				entity.heal(healthNeeded);
 				if (player instanceof PlayerEntity) {

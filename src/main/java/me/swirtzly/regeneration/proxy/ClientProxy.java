@@ -1,6 +1,7 @@
 package me.swirtzly.regeneration.proxy;
 
 import me.swirtzly.animateme.AnimationManager;
+import me.swirtzly.regeneration.RegenConfig;
 import me.swirtzly.regeneration.client.RegenKeyBinds;
 import me.swirtzly.regeneration.client.animation.GeneralAnimations;
 import me.swirtzly.regeneration.client.gui.BioContainerScreen;
@@ -64,8 +65,8 @@ public class ClientProxy extends CommonProxy {
 
         AnimationManager.registerAnimations(new GeneralAnimations(), new FieryRenderer(), new TypeLayFadeRenderer());
 
-		ClientRegistry.bindTileEntitySpecialRenderer(HandInJarTile.class, new HandTileRenderer());
-        ClientRegistry.bindTileEntitySpecialRenderer(ArchTile.class, new ArchRender());
+		ClientRegistry.bindTileEntityRenderer(RegenObjects.Tiles.HAND_JAR.get(), HandTileRenderer::new);
+		ClientRegistry.bindTileEntityRenderer(RegenObjects.Tiles.ARCH.get(), ArchRender::new);
 
     }
 	

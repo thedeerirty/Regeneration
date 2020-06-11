@@ -24,7 +24,7 @@ public class SolidItem extends Item {
     @Nullable
     @Override
     public Entity createEntity(World world, Entity location, ItemStack itemstack) {
-        OverrideEntity entity = new OverrideEntity(world, location.posX, location.posY, location.posZ, itemstack);
+        OverrideEntity entity = new OverrideEntity(world, location.getPosX(), location.getPosY(), location.getPosZ(), itemstack);
         entity.setMotion(location.getMotion());
         if (location instanceof ItemEntity) {
             entity.setOwnerId(((ItemEntity) location).getOwnerId());

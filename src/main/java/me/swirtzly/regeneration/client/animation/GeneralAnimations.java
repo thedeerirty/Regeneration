@@ -49,43 +49,43 @@ public class GeneralAnimations implements AnimationManager.IAnimate {
     }
 
     @Override
-    public void postAnimation(BipedModel modelBiped, LivingEntity entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+    public void postAnimation(BipedModel model, LivingEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         ItemStack stack = entity.getHeldItemMainhand();
         ItemStack offStack = entity.getHeldItemOffhand();
 
-            // ==============FOB WATCH & JAR START==============
-            boolean isOpen;
+        // ==============FOB WATCH & JAR START==============
+        boolean isOpen;
 
-            // MAINHAND
-            if (stack.getItem() instanceof FobWatchItem) {
-                isOpen = FobWatchItem.getOpen(stack) == 1;
-                if (isOpen) {
-                    makeZombieArms(modelBiped);
-                }
+        // MAINHAND
+        if (stack.getItem() instanceof FobWatchItem) {
+            isOpen = FobWatchItem.getOpen(stack) == 1;
+            if (isOpen) {
+                makeZombieArms(model);
             }
+        }
 
-            // OFFHAND
-            if (offStack.getItem() instanceof FobWatchItem) {
-                isOpen = FobWatchItem.getOpen(stack) == 1;
-                if (isOpen) {
-                    makeZombieArms(modelBiped);
-                }
+        // OFFHAND
+        if (offStack.getItem() instanceof FobWatchItem) {
+            isOpen = FobWatchItem.getOpen(stack) == 1;
+            if (isOpen) {
+                makeZombieArms(model);
             }
-            // ==============FOB WATCH END==============
+        }
+        // ==============FOB WATCH END==============
 
         RegenCap.get(entity).ifPresent((data) -> {
-                // JAR SYNCING
-                if (data.isSyncingToJar()) {
-                    makeZombieArms(modelBiped);
-                    modelBiped.bipedHead.rotateAngleX = (float) Math.toRadians(45);
-                }
+            // JAR SYNCING
+            if (data.isSyncingToJar()) {
+                makeZombieArms(model);
+                model.bipedHead.rotateAngleX = (float) Math.toRadians(45);
+            }
 
             if (data.getState() == PlayerUtil.RegenState.POST && PlayerUtil.isAboveZeroGrid(entity)) {
-                modelBiped.bipedHead.rotateAngleX = (float) Math.toRadians(0);
-                modelBiped.bipedHead.rotateAngleY = (float) Math.toRadians(0);
-                modelBiped.bipedHead.rotateAngleZ = (float) Math.toRadians(0);
+                model.bipedHead.rotateAngleX = (float) Math.toRadians(0);
+                model.bipedHead.rotateAngleY = (float) Math.toRadians(0);
+                model.bipedHead.rotateAngleZ = (float) Math.toRadians(0);
             }
-            });
+        });
     }
 
 

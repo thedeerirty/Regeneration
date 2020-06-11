@@ -4,7 +4,6 @@ import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import com.mojang.blaze3d.platform.GlStateManager;
 import me.swirtzly.regeneration.RegenConfig;
 import me.swirtzly.regeneration.Regeneration;
-import me.swirtzly.regeneration.client.image.ImageDownloadBuffer;
 import me.swirtzly.regeneration.client.rendering.types.ATypeRenderer;
 import me.swirtzly.regeneration.common.capability.IRegen;
 import me.swirtzly.regeneration.common.capability.RegenCap;
@@ -130,7 +129,6 @@ public class SkinManipulation {
 			skinType = getSkinType(player, true);
 		} else {
 			NativeImage nativeImage = decodeToImage(data.getEncodedSkin());
-			nativeImage = ImageDownloadBuffer.convert(nativeImage);
 			if (nativeImage == null) {
 				resourceLocation = DefaultPlayerSkin.getDefaultSkin(player.getUniqueID());
 			} else {
@@ -188,16 +186,15 @@ public class SkinManipulation {
 		Map<MinecraftProfileTexture.Type, ResourceLocation> playerTextures = playerInfo.playerTextures;
 		playerTextures.put(MinecraftProfileTexture.Type.SKIN, texture);
 		if (texture == null) {
-			ObfuscationReflectionHelper.setPrivateValue(NetworkPlayerInfo.class, playerInfo, false, 4);
+			ObfuscationReflectionHelper.setPrivateValue(NetworkPlayerInfo.class, playerInfo, false, "playerTexturesLoaded");
 		}
 	}
-
 
 	public static void setPlayerSkinType(AbstractClientPlayerEntity player, SkinInfo.SkinType skinType) {
 		if (skinType.getMojangType().equals(player.getSkinType())) return;
 		NetworkPlayerInfo playerInfo = player.playerInfo;
 		if (playerInfo == null) return;
-		ObfuscationReflectionHelper.setPrivateValue(NetworkPlayerInfo.class, playerInfo, skinType.getMojangType(), 5);
+		ObfuscationReflectionHelper.setPrivateValue(NetworkPlayerInfo.class, playerInfo, skinType.getMojangType(), "skinType");
 	}
 
 

@@ -2,9 +2,9 @@ package me.swirtzly.regeneration.util.common;
 
 import me.swirtzly.regeneration.RegenConfig;
 import me.swirtzly.regeneration.Regeneration;
-import me.swirtzly.regeneration.client.image.ImageDownloader;
 import me.swirtzly.regeneration.util.client.ClientUtil;
 import me.swirtzly.regeneration.util.client.SkinDownloadManager;
+import net.minecraft.client.renderer.texture.DownloadingTexture;
 import org.apache.commons.io.FileUtils;
 
 import javax.imageio.ImageIO;
@@ -71,7 +71,7 @@ public class FileUtil {
 		BufferedImage img = ImageIO.read(uc.getInputStream());
 		img = ClientUtil.ImageFixer.convertSkinTo64x64(img);
 
-		File file = ImageDownloader.isAlexSkin(img) ? alexDir : steveDir;
+		File file = alexDir;
 
 		if (!file.exists()) {
 			file.mkdirs();

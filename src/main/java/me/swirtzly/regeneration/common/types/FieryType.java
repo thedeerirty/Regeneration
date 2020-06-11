@@ -46,9 +46,9 @@ public class FieryType implements RegenType<FieryRenderer> {
 
 		if (!PlayerUtil.isAboveZeroGrid(livingEntity)) {
 			RegenUtil.regenerationExplosion(livingEntity);
-			double x = livingEntity.posX + livingEntity.getRNG().nextGaussian() * 2;
-			double y = livingEntity.posY + 0.5 + livingEntity.getRNG().nextGaussian() * 2;
-			double z = livingEntity.posZ + livingEntity.getRNG().nextGaussian() * 2;
+			double x = livingEntity.getPosX() + livingEntity.getRNG().nextGaussian() * 2;
+			double y = livingEntity.getPosY() + 0.5 + livingEntity.getRNG().nextGaussian() * 2;
+			double z = livingEntity.getPosZ() + livingEntity.getRNG().nextGaussian() * 2;
 			livingEntity.world.createExplosion(livingEntity, x, y, z, 0.1F, RegenConfig.COMMON.fieryRegen.get(), Explosion.Mode.NONE);
 			Iterator<BlockPos> iterator = getAllInBox(livingEntity.getPosition().north().west(), livingEntity.getPosition().south().east()).iterator();
 			while (iterator.hasNext()) {

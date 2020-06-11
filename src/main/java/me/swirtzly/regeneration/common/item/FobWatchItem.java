@@ -96,7 +96,7 @@ public class FobWatchItem extends SolidItem {
 
         RegenCap.get(player).ifPresent((cap) -> {
 
-            if (!player.isSneaking()) { // transferring watch->player
+            if (!player.isShiftKeyDown()) { // transferring watch->player
 				if (stack.getDamage() == RegenConfig.COMMON.regenCapacity.get()) {
 					 msgUsageFailed(player, "regeneration.messages.transfer.empty_watch", stack);
 				}	
@@ -161,7 +161,7 @@ public class FobWatchItem extends SolidItem {
 	
 	private ActionResult<ItemStack> msgUsageFailed(PlayerEntity player, String message, ItemStack stack) {
 		PlayerUtil.sendMessage(player, message, true);
-		return ActionResult.newResult(ActionResultType.FAIL, stack);
+		return ActionResult.resultFail(stack);
 	}
 
     @Override

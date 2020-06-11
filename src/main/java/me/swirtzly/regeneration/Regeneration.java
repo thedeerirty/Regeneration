@@ -76,9 +76,9 @@ public class Regeneration {
     public static Proxy proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> CommonProxy::new);
 
     private void doClientStuff(final FMLClientSetupEvent event) {
-		RenderingRegistry.registerEntityRenderingHandler(OverrideEntity.class, ItemOverrideRenderer::new);
-        RenderingRegistry.registerEntityRenderingHandler(TimelordEntity.class, TimelordRenderer::new);
-        RenderingRegistry.registerEntityRenderingHandler(LaserEntity.class, LaserRenderer::new);
+		RenderingRegistry.registerEntityRenderingHandler(RegenObjects.EntityEntries.ITEM_OVERRIDE_ENTITY_TYPE.get(), ItemOverrideRenderer::new);
+        RenderingRegistry.registerEntityRenderingHandler(RegenObjects.EntityEntries.TIMELORD.get(), TimelordRenderer::new);
+        RenderingRegistry.registerEntityRenderingHandler(RegenObjects.EntityEntries.LASER.get(), LaserRenderer::new);
 	}
 
     private void setup(final FMLCommonSetupEvent event) {
@@ -87,12 +87,6 @@ public class Regeneration {
 		ActingForwarder.init();
 		TriggerManager.init();
 		RegenObjects.Biomes.registerBiomeTypes();
-
-
-		if (ModList.get().isLoaded("tardis")) {
-			TardisCompat.addTardisCompat();
-		}
-
 
 	}
     

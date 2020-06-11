@@ -79,6 +79,13 @@ public class TimelordEntity extends AbstractVillagerEntity implements IRangedAtt
         getDataManager().register(SWINGING_ARMS, false);
     }
 
+    @Override
+    protected void onVillagerTrade(MerchantOffer offer) {
+        if (offer.func_226654_r_()) {
+            int i = 3 + this.rand.nextInt(4);
+            this.world.addEntity(new ExperienceOrbEntity(this.world, this.getPosX(), this.getPosY() + 0.5D, this.getPosZ(), i));
+        }
+    }
 
 
     @Override
@@ -189,12 +196,12 @@ public class TimelordEntity extends AbstractVillagerEntity implements IRangedAtt
             LaserEntity laserEntity = new LaserEntity(RegenObjects.EntityEntries.LASER.get(), this, this.world);
             laserEntity.setColor(new Vec3d(1, 0, 0));
             laserEntity.setDamage(gunItem.getDamage());
-            double d0 = target.posX - this.posX;
-            double d1 = target.getBoundingBox().minY + (double) (target.getHeight() / 3.0F) - laserEntity.posY;
-            double d2 = target.posZ - this.posZ;
-            double d3 = (double) MathHelper.sqrt(d0 * d0 + d2 * d2);
+            double d0 = target.getPosX() - this.getPosX();
+            double d1 = target.getBoundingBox().minY + (double) (target.getHeight() / 3.0F) - laserEntity.getPosY();
+            double d2 = target.getPosZ() - this.getPosZ();
+            double d3 = MathHelper.sqrt(d0 * d0 + d2 * d2);
             laserEntity.shoot(d0, d1 + d3 * (double) 0.2F, d2, 1.6F, (float) (14 - this.world.getDifficulty().getId() * 4));
-            this.world.playSound(null, this.posX, this.posY, this.posZ, this.getHeldItemMainhand().getItem() == RegenObjects.Items.PISTOL.get() ? RegenObjects.Sounds.STASER.get() : RegenObjects.Sounds.RIFLE.get(), SoundCategory.NEUTRAL, 0.5F, 0.4F / (rand.nextFloat() * 0.4F + 0.8F));
+            this.world.playSound(null, this.getPosX(), this.getPosY(), this.getPosZ(), this.getHeldItemMainhand().getItem() == RegenObjects.Items.PISTOL.get() ? RegenObjects.Sounds.STASER.get() : RegenObjects.Sounds.RIFLE.get(), SoundCategory.NEUTRAL, 0.5F, 0.4F / (rand.nextFloat() * 0.4F + 0.8F));
             this.world.addEntity(laserEntity);
         }
     }
@@ -281,15 +288,6 @@ public class TimelordEntity extends AbstractVillagerEntity implements IRangedAtt
     }
 
     @Override
-    protected void func_213713_b(MerchantOffer merchantOffer) {
-        if (merchantOffer.func_222221_q()) {
-            int i = 3 + this.rand.nextInt(4);
-            this.world.addEntity(new ExperienceOrbEntity(this.world, this.posX, this.posY + 0.5D, this.posZ, i));
-        }
-
-    }
-
-    @Override
     public boolean func_213705_dZ() {
         return false;
     }
@@ -320,7 +318,7 @@ public class TimelordEntity extends AbstractVillagerEntity implements IRangedAtt
             if (flag) {
                 itemstack.interactWithEntity(player, this, hand);
                 return true;
-            } else if (itemstack.getItem() != Items.VILLAGER_SPAWN_EGG && this.isAlive() && !this.func_213716_dX() && !this.isChild()) {
+            } else if (itemstack.getItem() != Items.VILLAGER_SPAWN_EGG && this.isAlive() && !this.hasCustomer() && !this.isChild()) {
                 if (hand == Hand.MAIN_HAND) {
                     player.addStat(Stats.TALKED_TO_VILLAGER);
                 }
@@ -328,9 +326,8 @@ public class TimelordEntity extends AbstractVillagerEntity implements IRangedAtt
                 if (this.getOffers().isEmpty()) {
                     return super.processInteract(player, hand);
                 } else {
-                    if (!this.world.isRemote) {
-                        this.setCustomer(player);
-                        this.func_213707_a(player, this.getDisplayName(), 1);
+                    if (!this.world.isRemote && !this.offers.isEmpty()) {
+                        this.displayMerchantGui(player);
                     }
 
                     return true;
@@ -340,6 +337,11 @@ public class TimelordEntity extends AbstractVillagerEntity implements IRangedAtt
             }
         }
         return super.processInteract(player, hand);
+    }
+
+    private void displayMerchantGui(PlayerEntity player) {
+        this.setCustomer(player);
+        this.openMerchantContainer(player, this.getDisplayName(), 1);
     }
 
     @Override

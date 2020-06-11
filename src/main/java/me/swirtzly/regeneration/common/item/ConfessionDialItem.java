@@ -43,7 +43,7 @@ public class ConfessionDialItem extends Item implements ICompatObject {
                     stack.setCount(0);
                 }
                 ServerWorld targetDimension = playerEntity.dimension == RegenObjects.GALLIFREY_TYPE ? overworld : gallifrey;
-                playerEntity.teleport(targetDimension, playerEntity.posX, Worldutil.getTopBlockForPos(targetDimension, new BlockPos(playerEntity.posX, 35, playerEntity.posZ)), playerEntity.posZ, playerEntity.rotationYaw, playerEntity.rotationPitch);
+                playerEntity.teleport(targetDimension, playerEntity.getPosX(), Worldutil.getTopBlockForPos(targetDimension, new BlockPos(playerEntity.getPosX(), 35, playerEntity.getPosZ())), playerEntity.getPosZ(), playerEntity.rotationYaw, playerEntity.rotationPitch);
                 playerEntity.getCooldownTracker().setCooldown(stack.getItem().getItem(), 200);
             }
         }

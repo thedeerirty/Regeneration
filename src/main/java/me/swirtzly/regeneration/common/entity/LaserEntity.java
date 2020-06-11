@@ -67,7 +67,7 @@ public class LaserEntity extends ThrowableEntity {
 
     @Override
     public void tick() {
-        double speed = (new Vec3d(this.posX, this.posY, this.posZ)).distanceTo(new Vec3d(this.prevPosX, this.prevPosY, this.prevPosZ));
+        double speed = (new Vec3d(this.getPosX(), this.getPosY(), this.getPosZ())).distanceTo(new Vec3d(this.prevPosX, this.prevPosY, this.prevPosZ));
         if (!this.world.isRemote && (this.ticksExisted > 600 || speed < 0.01D)) {
             this.remove();
         }
@@ -99,9 +99,9 @@ public class LaserEntity extends ThrowableEntity {
                     TNTEntity tntEntity = new TNTEntity(this.world, (double) ((float) pos.getX() + 0.5F), (double) pos.getY(), (double) ((float) pos.getZ() + 0.5F), this.getThrower());
                     tntEntity.setFuse(0);
                     this.world.addEntity(tntEntity);
-                    this.world.playSound(null, tntEntity.posX, tntEntity.posY, tntEntity.posZ, SoundEvents.ENTITY_TNT_PRIMED, SoundCategory.BLOCKS, 1.0F, 1.0F);
+                    this.world.playSound(null, tntEntity.getPosX(), tntEntity.getPosY(), tntEntity.getPosZ(), SoundEvents.ENTITY_TNT_PRIMED, SoundCategory.BLOCKS, 1.0F, 1.0F);
                     if (this.world.isRemote()) {
-                        this.world.addParticle(ParticleTypes.SMOKE, true, this.posX, this.posY, this.posZ, 0.0D, 0.0D, 0.0D);
+                        this.world.addParticle(ParticleTypes.SMOKE, true, this.getPosX(), this.getPosY(), this.getPosZ(), 0.0D, 0.0D, 0.0D);
                     }
                 }
             }

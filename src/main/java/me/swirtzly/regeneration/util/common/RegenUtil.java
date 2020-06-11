@@ -114,8 +114,8 @@ public class RegenUtil {
 				float densMod = 1;
 
                 int xr, zr;
-				xr = (int) -(victim.posX - exploder.posX);
-				zr = (int) -(victim.posZ - exploder.posZ);
+				xr = (int) -(victim.getPosX() - exploder.getPosX());
+				zr = (int) -(victim.getPosZ() - exploder.getPosZ());
 
                 victim.knockBack(exploder, (float) (knockback * densMod), xr, zr);
             }

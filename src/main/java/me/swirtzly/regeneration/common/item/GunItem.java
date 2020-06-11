@@ -53,7 +53,7 @@ public class GunItem extends SolidItem {
         if (entityLiving instanceof PlayerEntity) {
             PlayerEntity playerIn = (PlayerEntity) entityLiving;
             if (stack.getDamage() < stack.getMaxDamage() && !playerIn.getCooldownTracker().hasCooldown(this)) {
-                worldIn.playSound(null, playerIn.posX, playerIn.posY, playerIn.posZ, this == RegenObjects.Items.PISTOL.get() ? RegenObjects.Sounds.STASER.get() : RegenObjects.Sounds.RIFLE.get(), SoundCategory.NEUTRAL, 0.5F, 0.4F / (random.nextFloat() * 0.4F + 0.8F));
+                worldIn.playSound(null, playerIn.getPosX(), playerIn.getPosY(), playerIn.getPosZ(), this == RegenObjects.Items.PISTOL.get() ? RegenObjects.Sounds.STASER.get() : RegenObjects.Sounds.RIFLE.get(), SoundCategory.NEUTRAL, 0.5F, 0.4F / (random.nextFloat() * 0.4F + 0.8F));
                 playerIn.getCooldownTracker().setCooldown(this, cooldown);
                 setDamage(stack, getDamage(stack) + 1);
                 if (!worldIn.isRemote) {

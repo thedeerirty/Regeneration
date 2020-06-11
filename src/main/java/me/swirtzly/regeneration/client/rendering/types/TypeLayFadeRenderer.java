@@ -1,6 +1,8 @@
 package me.swirtzly.regeneration.client.rendering.types;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import me.swirtzly.regeneration.common.capability.IRegen;
 import me.swirtzly.regeneration.common.capability.RegenCap;
 import me.swirtzly.regeneration.common.types.RegenTypes;
@@ -35,12 +37,13 @@ public class TypeLayFadeRenderer extends ATypeRenderer<TypeLayFade> {
     }
 
     @Override
-    protected void renderRegenerationLayer(TypeLayFade type, LivingRenderer renderLivingBase, IRegen capability, LivingEntity entityPlayer, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
-        FieryRenderer.renderOverlay(renderLivingBase, entityPlayer, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale);
+    protected void renderRegenerationLayer(TypeLayFade type, LivingRenderer renderer, IRegen cap, LivingEntity playerEntity, MatrixStack matrixStack, IVertexBuilder buffer, float partialTicks, int packedLight, int packedOverlay, float r, float g, float b, float a) {
+        FieryRenderer.renderOverlay(playerEntity, renderer, matrixStack, buffer, packedLight, packedOverlay, partialTicks);
+
     }
 
     @Override
-    public void renderHand(LivingEntity player, HandSide handSide, LivingRenderer render) {
+    public void renderHand(LivingEntity player, HandSide handSide, LivingRenderer render, MatrixStack stack) {
 
     }
 
@@ -60,7 +63,7 @@ public class TypeLayFadeRenderer extends ATypeRenderer<TypeLayFade> {
     }
 
     @Override
-    public void postAnimation(BipedModel model, LivingEntity entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+    public void postAnimation(BipedModel model, LivingEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         RegenCap.get(entity).ifPresent((data) -> {
             if (data.getState() == PlayerUtil.RegenState.REGENERATING && data.getType() == RegenTypes.HARTNELL) {
                 model.bipedHead.rotateAngleX = (float) Math.toRadians(0);

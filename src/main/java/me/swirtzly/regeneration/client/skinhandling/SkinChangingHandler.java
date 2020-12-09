@@ -229,22 +229,12 @@ public class SkinChangingHandler {
      * @param texture - ResourceLocation of intended texture
      */
     public static void setPlayerSkin(AbstractClientPlayer player, ResourceLocation texture) {
-        if (player.getLocationSkin() == texture) {
-            return;
-        }
-        NetworkPlayerInfo playerInfo = player.playerInfo;
-        if (playerInfo == null) return;
-        Map<MinecraftProfileTexture.Type, ResourceLocation> playerTextures = playerInfo.playerTextures;
-        playerTextures.put(MinecraftProfileTexture.Type.SKIN, texture);
-        if (texture == null) playerInfo.playerTexturesLoaded = false;
-    }
+       
+     }
 
     public static void setSkinType(AbstractClientPlayer player, SkinInfo.SkinType skinType) {
-     NetworkPlayerInfo playerInfo = player.playerInfo;
-     if (playerInfo != null) {
-      playerInfo.skinType = skinType.getMojangType();
+ 
      }
-    }
 
     public static SkinInfo.SkinType getSkinType(EntityPlayer player, boolean forceMojang) {
         Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> map = Minecraft.getMinecraft().getSkinManager().loadSkinFromCache(player.getGameProfile());
